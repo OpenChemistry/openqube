@@ -17,56 +17,57 @@
 #ifndef MOPACAUX_H
 #define MOPACAUX_H
 
-#include <QString>
-#include <QTextStream>
+#include <QtCore/QTextStream>
 #include <Eigen/Core>
 #include <vector>
 
+class QString;
+
 namespace openqube
 {
-  class SlaterSet;
+class SlaterSet;
 
-  class MopacAux
-  {
-  public:
-    MopacAux(QString filename, SlaterSet *basis);
-    ~MopacAux();
-    void outputAll();
+class MopacAux
+{
+public:
+  MopacAux(QString filename, SlaterSet *basis);
+  ~MopacAux();
+  void outputAll();
 
-  private:
-    QTextStream m_in;
-    void processLine();
-    void load(SlaterSet* basis);
-    std::vector<int> readArrayI(unsigned int n);
-    std::vector<double> readArrayD(unsigned int n);
-    std::vector<int> readArraySym(unsigned int n);
-    std::vector<Eigen::Vector3d> readArrayVec(unsigned int n);
-    bool readOverlapMatrix(unsigned int n);
-    bool readEigenVectors(unsigned int n);
-    bool readDensityMatrix(unsigned int n);
+private:
+  QTextStream m_in;
+  void processLine();
+  void load(SlaterSet* basis);
+  std::vector<int> readArrayI(unsigned int n);
+  std::vector<double> readArrayD(unsigned int n);
+  std::vector<int> readArraySym(unsigned int n);
+  std::vector<Eigen::Vector3d> readArrayVec(unsigned int n);
+  bool readOverlapMatrix(unsigned int n);
+  bool readEigenVectors(unsigned int n);
+  bool readDensityMatrix(unsigned int n);
 
-    int m_electrons;
-    std::vector<int> m_aNums;
-    std::vector<double> m_aPos;
-    std::vector<int> m_shellTypes;
-    std::vector<int> m_shellNums;
-    std::vector<int> m_shelltoAtom;
-    std::vector<double> m_c;
-    std::vector<double> m_csp;
-    std::vector<double> m_orbitalEnergy;
-    std::vector<double> m_MOcoeffs;
+  int m_electrons;
+  std::vector<int> m_aNums;
+  std::vector<double> m_aPos;
+  std::vector<int> m_shellTypes;
+  std::vector<int> m_shellNums;
+  std::vector<int> m_shelltoAtom;
+  std::vector<double> m_c;
+  std::vector<double> m_csp;
+  std::vector<double> m_orbitalEnergy;
+  std::vector<double> m_MOcoeffs;
 
-    std::vector<int> m_atomIndex;
-    std::vector<int> m_atomSym;
-    std::vector<double> m_zeta;
-    std::vector<int> m_pqn;
-    std::vector<Eigen::Vector3d> m_atomPos;
+  std::vector<int> m_atomIndex;
+  std::vector<int> m_atomSym;
+  std::vector<double> m_zeta;
+  std::vector<int> m_pqn;
+  std::vector<Eigen::Vector3d> m_atomPos;
 
-    Eigen::MatrixXd m_overlap;     /// Overlap matrix
-    Eigen::MatrixXd m_eigenVectors;
-    Eigen::MatrixXd m_density;     /// Total density matrix
-  };
+  Eigen::MatrixXd m_overlap;     /// Overlap matrix
+  Eigen::MatrixXd m_eigenVectors;
+  Eigen::MatrixXd m_density;     /// Total density matrix
+};
 
-} // End namespace Avogadro
+} // End namespace
 
 #endif

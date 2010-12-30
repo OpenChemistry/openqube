@@ -17,43 +17,44 @@
 #ifndef GAUSSIANFCHK_H
 #define GAUSSIANFCHK_H
 
-#include <QString>
-#include <QIODevice>
+#include <QtCore/QIODevice>
 #include <Eigen/Core>
 #include <vector>
 
+class QString;
+
 namespace openqube
 {
-  class GaussianSet;
+class GaussianSet;
 
-  class GaussianFchk
-  {
-  public:
-    GaussianFchk(const QString &filename, GaussianSet *basis);
-    ~GaussianFchk();
-    void outputAll();
-  private:
-    QIODevice *m_in;
-    void processLine();
-    void load(GaussianSet* basis);
-    std::vector<int> readArrayI(unsigned int n);
-    std::vector<double> readArrayD(unsigned int n, int width = 0);
-    bool readDensityMatrix(unsigned int n, int width = 0);
+class GaussianFchk
+{
+public:
+  GaussianFchk(const QString &filename, GaussianSet *basis);
+  ~GaussianFchk();
+  void outputAll();
+private:
+  QIODevice *m_in;
+  void processLine();
+  void load(GaussianSet* basis);
+  std::vector<int> readArrayI(unsigned int n);
+  std::vector<double> readArrayD(unsigned int n, int width = 0);
+  bool readDensityMatrix(unsigned int n, int width = 0);
 
-    int m_electrons;
-    unsigned int m_numBasisFunctions;
-    std::vector<int> m_aNums;
-    std::vector<double> m_aPos;
-    std::vector<int> m_shellTypes;
-    std::vector<int> m_shellNums;
-    std::vector<int> m_shelltoAtom;
-    std::vector<double> m_a;
-    std::vector<double> m_c;
-    std::vector<double> m_csp;
-    std::vector<double> m_orbitalEnergy;
-    std::vector<double> m_MOcoeffs;
-    Eigen::MatrixXd m_density;     /// Total density matrix
-  };
+  int m_electrons;
+  unsigned int m_numBasisFunctions;
+  std::vector<int> m_aNums;
+  std::vector<double> m_aPos;
+  std::vector<int> m_shellTypes;
+  std::vector<int> m_shellNums;
+  std::vector<int> m_shelltoAtom;
+  std::vector<double> m_a;
+  std::vector<double> m_c;
+  std::vector<double> m_csp;
+  std::vector<double> m_orbitalEnergy;
+  std::vector<double> m_MOcoeffs;
+  Eigen::MatrixXd m_density;     /// Total density matrix
+};
 
 } // End namespace openqube
 

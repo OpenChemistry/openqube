@@ -19,12 +19,13 @@
 
 #include "basisset.h"
 
-#include <QObject>
-#include <QFuture>
-#include <QFutureWatcher>
+#include <QtCore/QFuture>
 
 #include <Eigen/Core>
 #include <vector>
+
+namespace openqube
+{
 
 /**
  * @class SlaterSet slaterset.h
@@ -44,137 +45,133 @@
  * orbitals have five (or six if cartesian types) coefficients, and so on.
  */
 
-namespace openqube
+struct SlaterShell;
+
+class OPENQUBE_EXPORT SlaterSet : public BasisSet
 {
-
-  class Molecule;
-  class Cube;
-  struct SlaterShell;
-
-  class OPENQUBE_EXPORT SlaterSet : public BasisSet
-  {
   Q_OBJECT
 
-  public:
-    /**
-     * Constructor.
-     */
-    SlaterSet();
+public:
+  /**
+   * Constructor.
+   */
+  SlaterSet();
 
-    /**
-     * Destructor.
-     */
-    ~SlaterSet();
+  /**
+   * Destructor.
+   */
+  ~SlaterSet();
 
-    /**
-     * Enumeration of the Slater orbital types.
-     */
-    enum slater { S, PX, PY, PZ, X2, XZ, Z2, YZ, XY, UU };
+  /**
+   * Enumeration of the Slater orbital types.
+   */
+  enum slater { S, PX, PY, PZ, X2, XZ, Z2, YZ, XY, UU };
 
-    /**
-     * Function to add an atom to the SlaterSet.
-     * @param pos Position of the center of the QAtom.
-     * @return The index of the added atom.
-     */
-    bool addAtoms(const std::vector<Eigen::Vector3d> &pos);
+  /**
+   * Function to add an atom to the SlaterSet.
+   * @param pos Position of the center of the QAtom.
+   * @return The index of the added atom.
+   */
+  bool addAtoms(const std::vector<Eigen::Vector3d> &pos);
 
-    /**
-     * Add a basis to the basis set.
-     * @param i Index of the atom to add the Basis too.
-     * @return The index of the added Basis.
-     */
-    bool addSlaterIndices(const std::vector<int> &i);
+  /**
+   * Add a basis to the basis set.
+   * @param i Index of the atom to add the Basis too.
+   * @return The index of the added Basis.
+   */
+  bool addSlaterIndices(const std::vector<int> &i);
 
-    /**
-     * Add the symmetry types for the orbitals.
-     * @param t Vector containing the types of symmetry using the slater enum.
-     */
-    bool addSlaterTypes(const std::vector<int> &t);
+  /**
+   * Add the symmetry types for the orbitals.
+   * @param t Vector containing the types of symmetry using the slater enum.
+   */
+  bool addSlaterTypes(const std::vector<int> &t);
 
-    /**
-     * Add a STO to the supplied basis.
-     * @param zetas The exponents of the STOs
-     * @return True if successful.
-     */
-    bool addZetas(const std::vector<double> &zetas);
+  /**
+   * Add a STO to the supplied basis.
+   * @param zetas The exponents of the STOs
+   * @return True if successful.
+   */
+  bool addZetas(const std::vector<double> &zetas);
 
-    /**
-     * The PQNs for the orbitals.
-     */
-    bool addPQNs(const std::vector<int> &pqns);
+  /**
+   * The PQNs for the orbitals.
+   */
+  bool addPQNs(const std::vector<int> &pqns);
 
-    /**
-     * The overlap matrix.
-     * @param m Matrix containing the overlap matrix for the basis.
-     */
-    bool addOverlapMatrix(const Eigen::MatrixXd &m);
+  /**
+   * The overlap matrix.
+   * @param m Matrix containing the overlap matrix for the basis.
+   */
+  bool addOverlapMatrix(const Eigen::MatrixXd &m);
 
-    /**
-     * Add Eigen Vectors to the SlaterSet.
-     * @param MOs Matrix of the eigen vectors for the SlaterSet.
-     */
-    bool addEigenVectors(const Eigen::MatrixXd &e);
+  /**
+   * Add Eigen Vectors to the SlaterSet.
+   * @param MOs Matrix of the eigen vectors for the SlaterSet.
+   */
+  bool addEigenVectors(const Eigen::MatrixXd &e);
 
-    /**
-     * Add the density matrix to the SlaterSet.
-     * @param d Density matrix for the SlaterSet.
-     */
-    bool addDensityMatrix(const Eigen::MatrixXd &d);
+  /**
+   * Add the density matrix to the SlaterSet.
+   * @param d Density matrix for the SlaterSet.
+   */
+  bool addDensityMatrix(const Eigen::MatrixXd &d);
 
-    /**
-     * @return The number of MOs in the BasisSet.
-     */
-    unsigned int numMOs();
+  /**
+   * @return The number of MOs in the BasisSet.
+   */
+  unsigned int numMOs();
 
-    void outputAll();
+  void outputAll();
 
-    bool calculateCubeMO(Cube *cube, unsigned int state = 1);
+  bool calculateCubeMO(Cube *cube, unsigned int state = 1);
 
-    bool calculateCubeDensity(Cube *cube);
+  bool calculateCubeDensity(Cube *cube);
 
-    QFutureWatcher<void> & watcher() { return m_watcher; }
+  QFutureWatcher<void> & watcher() { return m_watcher; }
 
-  private Q_SLOTS:
-    /**
-     * Slot to set the cube data once Qt Concurrent is done
-     */
-     void calculationComplete();
+private Q_SLOTS:
+  /**
+   * Slot to set the cube data once Qt Concurrent is done
+   */
+  void calculationComplete();
 
-  private:
-    std::vector<Eigen::Vector3d> m_atomPos;
-    std::vector<int> m_slaterIndices;
-    std::vector<int> m_slaterTypes;
-    std::vector<double> m_zetas;
-    std::vector<int> m_pqns, m_PQNs;
+private:
+  std::vector<Eigen::Vector3d> m_atomPos;
+  std::vector<int> m_slaterIndices;
+  std::vector<int> m_slaterTypes;
+  std::vector<double> m_zetas;
+  std::vector<int> m_pqns, m_PQNs;
 
-    std::vector<double> m_factors;
-    Eigen::MatrixXd m_overlap;
-    Eigen::MatrixXd m_eigenVectors;
-    Eigen::MatrixXd m_density;
-    Eigen::MatrixXd m_normalized;
-    bool m_initialized;
+  std::vector<double> m_factors;
+  Eigen::MatrixXd m_overlap;
+  Eigen::MatrixXd m_eigenVectors;
+  Eigen::MatrixXd m_density;
+  Eigen::MatrixXd m_normalized;
+  bool m_initialized;
 
-    QFuture<void> m_future;
-    QFutureWatcher<void> m_watcher;
-    Cube *m_cube; // Cube to put the results into
-    QVector<SlaterShell> m_slaterShells;
+  QFuture<void> m_future;
+  QFutureWatcher<void> m_watcher;
+  Cube *m_cube; // Cube to put the results into
+  QVector<SlaterShell> m_slaterShells;
 
-    bool initialize();
+  bool initialize();
 
-    static bool isSmall(double val);
-    unsigned int factorial(unsigned int n);
+  static bool isSmall(double val);
+  unsigned int factorial(unsigned int n);
 
-    static void processPoint(SlaterShell &shell);
-    static void processDensity(SlaterShell &shell);
-    static double pointSlater(SlaterSet *set, const Eigen::Vector3d &delta,
-                      const double &dr2, unsigned int slater, unsigned int indexMO);
-    static double pointSlater(SlaterSet *set, const Eigen::Vector3d &delta,
-                      const double &dr2, unsigned int slater, unsigned int indexMO,
-                      double expZeta);
-    static double calcSlater(SlaterSet *set, const Eigen::Vector3d &delta,
-                      const double &dr2, unsigned int slater);
-  };
+  static void processPoint(SlaterShell &shell);
+  static void processDensity(SlaterShell &shell);
+  static double pointSlater(SlaterSet *set, const Eigen::Vector3d &delta,
+                            double dr2, unsigned int slater,
+                            unsigned int indexMO);
+  static double pointSlater(SlaterSet *set, const Eigen::Vector3d &delta,
+                            double dr2, unsigned int slater,
+                            unsigned int indexMO, double expZeta);
+  static double calcSlater(SlaterSet *set, const Eigen::Vector3d &delta,
+                           double dr2, unsigned int slater);
+};
 
-} // End namespace Avogadro
+} // End namespace
 
 #endif

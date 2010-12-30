@@ -25,35 +25,35 @@
 namespace openqube
 {
 
-  class MoldenFile
-  {
+class MoldenFile
+{
   // Parsing mode: section of the file currently being parsed
   enum mode { NotParsing, Atoms, GTO, STO, MO, SCF };
-  public:
-    MoldenFile(const QString &filename, GaussianSet *basis);
-    ~MoldenFile();
-    void outputAll();
-  private:
-    QIODevice *m_in;
-    void processLine();
-    void load(GaussianSet* basis);
+public:
+  MoldenFile(const QString &filename, GaussianSet *basis);
+  ~MoldenFile();
+  void outputAll();
+private:
+  QIODevice *m_in;
+  void processLine();
+  void load(GaussianSet* basis);
 
-    double m_coordFactor;
-    mode m_currentMode;
-    int m_electrons;
-    unsigned int m_numBasisFunctions;
-    std::vector<int> m_aNums;
-    std::vector<double> m_aPos;
-    std::vector<orbital> m_shellTypes;
-    std::vector<int> m_shellNums;
-    std::vector<int> m_shelltoAtom;
-    std::vector<double> m_a;
-    std::vector<double> m_c;
-    std::vector<double> m_csp;
-    std::vector<double> m_orbitalEnergy;
-    std::vector<double> m_MOcoeffs;
-  };
+  double m_coordFactor;
+  mode m_currentMode;
+  int m_electrons;
+  unsigned int m_numBasisFunctions;
+  std::vector<int> m_aNums;
+  std::vector<double> m_aPos;
+  std::vector<orbital> m_shellTypes;
+  std::vector<int> m_shellNums;
+  std::vector<int> m_shelltoAtom;
+  std::vector<double> m_a;
+  std::vector<double> m_c;
+  std::vector<double> m_csp;
+  std::vector<double> m_orbitalEnergy;
+  std::vector<double> m_MOcoeffs;
+};
 
-} // End namespace Avogadro
+} // End namespace
 
 #endif

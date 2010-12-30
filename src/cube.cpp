@@ -17,7 +17,7 @@
 #include "cube.h"
 
 #include <QtCore/QReadWriteLock>
-#include <QDebug>
+#include <QtCore/QDebug>
 
 namespace openqube {
 

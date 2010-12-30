@@ -29,90 +29,101 @@
 
 namespace openqube
 {
-  class Cube;
 
-  class OPENQUBE_EXPORT BasisSet : public QObject
+/**
+ * @class BasisSet gaussianset.h <openqube/basissetloader.h>
+ * @brief BasisSet contains basis set data, calculates cubes.
+ * @author Marcus D. Hanwell
+ *
+ * This is the base class for basis sets, and has two derived classes -
+ * GaussianSet and SlaterSet. It must be populated with data, and can then be
+ * used to calculate values of the basis set in a cube.
+ */
+
+class Cube;
+
+class OPENQUBE_EXPORT BasisSet : public QObject
+{
+  Q_OBJECT
+
+public:
+  /**
+   * Constructor.
+   */
+  BasisSet() : m_electrons(0) {}
+
+  /**
+   * Destructor.
+   */
+  virtual ~BasisSet() {}
+
+  /**
+   * Set the number of electrons in the BasisSet.
+   * @param n The number of electrons in the BasisSet.
+   */
+  void setNumElectrons(unsigned int n) { m_electrons = n; }
+
+  /**
+   * @return The number of electrons in the molecule.
+   */
+  unsigned int numElectrons() { return m_electrons; }
+
+  /**
+   * @return The number of MOs in the BasisSet.
+   */
+  virtual unsigned int numMOs() = 0;
+
+  /**
+   * Check if the given MO number is the HOMO or not.
+   * @param n The MO number.
+   * @return True if the given MO number is the HOMO.
+   */
+  bool HOMO(unsigned int n)
   {
-    Q_OBJECT
+    if (n+1 == static_cast<unsigned int>(m_electrons / 2))
+      return true;
+    else
+      return false;
+  }
 
-  public:
-    /**
-     * Constructor.
-     */
-    BasisSet() : m_electrons(0) {};
+  /**
+   * Check if the given MO number is the LUMO or not.
+   * @param n The MO number.
+   * @return True if the given MO number is the LUMO.
+   */
+  bool LUMO(unsigned int n)
+  {
+    if (n == static_cast<unsigned int>(m_electrons / 2))
+      return true;
+    else
+      return false;
+  }
 
-    /**
-     * Destructor.
-     */
-    virtual ~BasisSet() {};
+  /**
+   * Calculate the MO over the entire range of the supplied Cube.
+   * @param cube The cube to write the values of the MO into.
+   * @return True if the calculation was successful.
+   */
+  virtual bool calculateCubeMO(Cube *cube, unsigned int state = 1) = 0;
 
-    /**
-     * Set the number of electrons in the BasisSet.
-     * @param n The number of electrons in the BasisSet.
-     */
-    void setNumElectrons(unsigned int n) { m_electrons = n; }
+  /**
+   * Calculate the electron density over the entire range of the supplied Cube.
+   * @param cube The cube to write the values of the MO into.
+   * @return True if the calculation was successful.
+   */
+  virtual bool calculateCubeDensity(Cube *cube) = 0;
 
-    /**
-     * @return The number of electrons in the molecule.
-     */
-    unsigned int numElectrons() { return m_electrons; }
+  /**
+   * When performing a calculation the QFutureWatcher is useful if you want
+   * to update a progress bar.
+   */
+  virtual QFutureWatcher<void> & watcher()=0;
 
-    /**
-     * @return The number of MOs in the BasisSet.
-     */
-    virtual unsigned int numMOs() = 0;
+protected:
+  /// Total number of electrons
+  unsigned int m_electrons;
 
-    /**
-     * Check if the given MO number is the HOMO or not.
-     * @param n The MO number.
-     * @return True if the given MO number is the HOMO.
-     */
-    bool HOMO(unsigned int n)
-    {
-      if (n+1 == static_cast<unsigned int>(m_electrons / 2))
-        return true;
-      else
-        return false;
-    }
-
-    /**
-     * Check if the given MO number is the LUMO or not.
-     * @param n The MO number.
-     * @return True if the given MO number is the LUMO.
-     */
-    bool LUMO(unsigned int n)
-    {
-      if (n == static_cast<unsigned int>(m_electrons / 2))
-        return true;
-      else
-        return false;
-    }
-
-    /**
-     * Calculate the MO over the entire range of the supplied Cube.
-     * @param cube The cube to write the values of the MO into.
-     * @return True if the calculation was successful.
-     */
-    virtual bool calculateCubeMO(Cube *cube, unsigned int state = 1) = 0;
-
-    /**
-     * Calculate the electron density over the entire range of the supplied Cube.
-     * @param cube The cube to write the values of the MO into.
-     * @return True if the calculation was successful.
-     */
-    virtual bool calculateCubeDensity(Cube *cube) = 0;
-
-    /**
-     * When performing a calculation the QFutureWatcher is useful if you want
-     * to update a progress bar.
-     */
-    virtual QFutureWatcher<void> & watcher()=0;
-
-  protected:
-    /// Total number of electrons
-    unsigned int m_electrons;
-
-  };
+};
 
 } // End namespace openqube
 

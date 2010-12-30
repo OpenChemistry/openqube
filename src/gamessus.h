@@ -17,46 +17,48 @@
 #ifndef GAMESSUS_H
 #define GAMESSUS_H
 
-#include <QString>
-#include <QIODevice>
+#include <QtCore/QIODevice>
 #include <Eigen/Core>
 #include <vector>
 
 #include "gaussianset.h"
 
+class QString;
+
 namespace openqube
 {
-  class OPENQUBE_EXPORT GAMESSUSOutput
-  {
-    // Parsing mode: section of the file currently being parsed
-    enum mode { NotParsing, Atoms, GTO, MO};
+class OPENQUBE_EXPORT GAMESSUSOutput
+{
+  // Parsing mode: section of the file currently being parsed
+  enum mode { NotParsing, Atoms, GTO, MO};
 
-  public:
-    GAMESSUSOutput(const QString &filename, GaussianSet *basis);
-    ~GAMESSUSOutput();
-    void outputAll();
-  private:
-    QIODevice *m_in;
-    void processLine();
-    void load(GaussianSet* basis);
+public:
+  GAMESSUSOutput(const QString &filename, GaussianSet *basis);
+  ~GAMESSUSOutput();
+  void outputAll();
 
-    double m_coordFactor;
-    mode m_currentMode;
-    int m_electrons;
-    int m_currentAtom;
-    unsigned int m_numBasisFunctions;
-    std::vector<int> m_aNums;
-    std::vector<double> m_aPos;
-    std::vector<orbital> m_shellTypes;
-    std::vector<int> m_shellNums;
-    std::vector<int> m_shelltoAtom;
-    std::vector<double> m_a;
-    std::vector<double> m_c;
-    std::vector<double> m_csp;
-    std::vector<double> m_orbitalEnergy;
-    std::vector<double> m_MOcoeffs;
-  };
+private:
+  QIODevice *m_in;
+  void processLine();
+  void load(GaussianSet* basis);
 
-} // End namespace Avogadro
+  double m_coordFactor;
+  mode m_currentMode;
+  int m_electrons;
+  int m_currentAtom;
+  unsigned int m_numBasisFunctions;
+  std::vector<int> m_aNums;
+  std::vector<double> m_aPos;
+  std::vector<orbital> m_shellTypes;
+  std::vector<int> m_shellNums;
+  std::vector<int> m_shelltoAtom;
+  std::vector<double> m_a;
+  std::vector<double> m_c;
+  std::vector<double> m_csp;
+  std::vector<double> m_orbitalEnergy;
+  std::vector<double> m_MOcoeffs;
+};
+
+} // End namespace
 
 #endif

@@ -25,9 +25,9 @@
 #include "gamessus.h"
 #include "cube.h"
 
-#include <QDir>
-#include <QFileInfo>
-#include <QStringList>
+#include <QtCore/QDir>
+#include <QtCore/QFileInfo>
+#include <QtCore/QStringList>
 
 namespace openqube {
 

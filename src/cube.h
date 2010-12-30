@@ -29,7 +29,7 @@ class QReadWriteLock;
 namespace openqube {
 
 class OPENQUBE_EXPORT Cube
-  {
+{
 public:
   Cube();
   ~Cube();
@@ -44,26 +44,26 @@ public:
     MO,
     FromFile,
     None
-    };
+  };
 
   /**
-    * @return The minimum point in the cube.
-    */
+   * @return The minimum point in the cube.
+   */
   Eigen::Vector3d min() const { return m_min; }
 
   /**
-    * @return The maximum point in the cube.
-    */
+   * @return The maximum point in the cube.
+   */
   Eigen::Vector3d max() const { return m_max; }
 
   /**
-    * @return The spacing of the grid.
-    */
+   * @return The spacing of the grid.
+   */
   Eigen::Vector3d spacing() const { return m_spacing; }
 
   /**
-    * @return The x, y and z dimensions of the cube.
-    */
+   * @return The x, y and z dimensions of the cube.
+   */
   Eigen::Vector3i dimensions() const { return m_points; }
 
   /**
@@ -208,10 +208,10 @@ protected:
   QString m_name;
   Type    m_cubeType;
   QReadWriteLock *m_lock;
-  };
+};
 
 inline bool Cube::setValue(unsigned int i, double value)
-  {
+{
   if (i < m_data.size()) {
     m_data[i] = value;
     if (value > m_maxValue)
@@ -219,11 +219,11 @@ inline bool Cube::setValue(unsigned int i, double value)
     if (value < m_minValue)
       m_minValue = value;
     return true;
-    }
+  }
   else
     return false;
-  }
+}
 
-  } // End namespace
+} // End namespace
 
 #endif
