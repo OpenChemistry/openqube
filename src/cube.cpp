@@ -174,7 +174,7 @@ double Cube::value(int i, int j, int k) const
 {
   unsigned int index = i*m_points.y()*m_points.z() + j*m_points.z() + k;
   if (index < m_data.size())
-    return m_data.at(index);
+    return m_data[index];
   else {
     //      qDebug() << "Attempt to identify out of range index" << index << m_data.size();
     return 0.0;
@@ -187,7 +187,7 @@ double Cube::value(const Vector3i &pos) const
       pos.y()*m_points.z() +
       pos.z();
   if (index < m_data.size())
-    return m_data.at(index);
+    return m_data[index];
   else {
     qDebug() << "Attempted to access an index out of range.";
     return 6969.0;
