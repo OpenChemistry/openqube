@@ -41,7 +41,7 @@ using Eigen::Vector3i;
 using Eigen::MatrixXd;
 using Eigen::SelfAdjointEigenSolver;
 
-namespace openqube
+namespace OpenQube
 {
 struct SlaterShell
 {

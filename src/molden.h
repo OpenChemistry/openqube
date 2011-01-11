@@ -22,7 +22,7 @@
 
 #include "gaussianset.h"
 
-namespace openqube
+namespace OpenQube
 {
 
 class MoldenFile

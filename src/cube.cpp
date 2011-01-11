@@ -19,7 +19,7 @@
 #include <QtCore/QReadWriteLock>
 #include <QtCore/QDebug>
 
-namespace openqube {
+namespace OpenQube {
 
 using Eigen::Vector3i;
 using Eigen::Vector3f;

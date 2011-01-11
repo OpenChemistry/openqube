@@ -24,7 +24,7 @@
 #include <Eigen/Core>
 #include <vector>
 
-namespace openqube
+namespace OpenQube
 {
 
 /**

@@ -23,7 +23,7 @@
 
 class QString;
 
-namespace openqube
+namespace OpenQube
 {
 class GaussianSet;
 

@@ -21,7 +21,7 @@ using std::vector;
 
 #include <fstream>
 
-namespace openqube
+namespace OpenQube
 {
 
 // Below 2 functions stolen from OpenBabel

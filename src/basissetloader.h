@@ -22,17 +22,17 @@
 // Forward declarations
 class QString;
 
-namespace openqube {
+namespace OpenQube {
 
 class BasisSet;
 
 /**
- * @class BasisSetLoader gaussianset.h <openqube/basissetloader.h>
+ * @class BasisSetLoader basissetloader.h <openqube/basissetloader.h>
  * @brief BasisSetLoader chooses the correct parser, loads the file and returns
  * a basis set of the correct type.
  * @author Marcus D. Hanwell
  *
- * This class is very much subject to change. It removes the logic fromt the
+ * This class is very much subject to change. It removes the logic from the
  * individual classes, and takes care of choosing the correct parser before
  * loading a basis set and returning an object containing this data.
  */

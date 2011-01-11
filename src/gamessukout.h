@@ -28,7 +28,7 @@
 
 class QString;
 
-namespace openqube
+namespace OpenQube
 {
 /**
    * This class is used to hold the data parsed from the GAMESS-UK output

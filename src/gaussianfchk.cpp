@@ -24,7 +24,7 @@
 using Eigen::Vector3d;
 using std::vector;
 
-namespace openqube
+namespace OpenQube
 {
 
 GaussianFchk::GaussianFchk(const QString &filename, GaussianSet* basis)

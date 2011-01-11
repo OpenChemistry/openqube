@@ -26,7 +26,7 @@ using std::vector;
 using Eigen::MatrixXd;
 using Eigen::Vector3d;
 
-namespace openqube
+namespace OpenQube
 {
 
 MopacAux::MopacAux(QString filename, SlaterSet* basis)

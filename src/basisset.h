@@ -1,15 +1,11 @@
 /******************************************************************************
+
   This source file is part of the OpenQube project.
 
   Copyright 2008-2010 Marcus D. Hanwell
-  Copyright 2008 Albert De Fusco
   Copyright 2010 David C. Lonie
 
-  Licensed under the Apache License, Version 2.0 (the "License");
-  you may not use this file except in compliance with the License.
-  You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
+  This source code is released under the New BSD License, (the "License").
 
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,7 +23,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QFutureWatcher>
 
-namespace openqube
+namespace OpenQube
 {
 
 /**
@@ -102,9 +98,10 @@ public:
   /**
    * Calculate the MO over the entire range of the supplied Cube.
    * @param cube The cube to write the values of the MO into.
+   * @param mo The molecular orbital number to calculate.
    * @return True if the calculation was successful.
    */
-  virtual bool calculateCubeMO(Cube *cube, unsigned int state = 1) = 0;
+  virtual bool calculateCubeMO(Cube *cube, unsigned int mo = 1) = 0;
 
   /**
    * Calculate the electron density over the entire range of the supplied Cube.

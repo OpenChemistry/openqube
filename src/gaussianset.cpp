@@ -37,7 +37,7 @@ using Eigen::Vector3d;
 using Eigen::Vector3i;
 using Eigen::MatrixXd;
 
-namespace openqube
+namespace OpenQube
 {
 struct GaussianShell
 {

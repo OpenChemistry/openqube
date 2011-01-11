@@ -27,7 +27,7 @@ using std::vector;
 #define BOHR_TO_ANGSTROM 0.529177249
 #endif
 
-namespace openqube
+namespace OpenQube
 {
 
 GAMESSUSOutput::GAMESSUSOutput(const QString &filename, GaussianSet* basis):

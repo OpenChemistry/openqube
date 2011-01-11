@@ -29,7 +29,7 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QStringList>
 
-namespace openqube {
+namespace OpenQube {
 
 QString BasisSetLoader::MatchBasisSet(const QString& filename)
 {

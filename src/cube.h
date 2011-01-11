@@ -26,7 +26,7 @@
 // Forward declarations
 class QReadWriteLock;
 
-namespace openqube {
+namespace OpenQube {
 
 class OPENQUBE_EXPORT Cube
 {
@@ -121,8 +121,6 @@ public:
   unsigned int closestIndex(const Eigen::Vector3d &pos) const;
 
   /**
-   * @return Index vector of the point closest to the position supplied, in
-   * the form of i, j, k.
    * @param pos Position to get closest index for.
    * @return The i, j, k index closest to the position supplied.
    */
@@ -185,15 +183,15 @@ public:
   double minValue() const { return m_minValue; }
 
   /**
-   * @return The minimum  value at any point in the Cube.
+   * @return The maximum  value at any point in the Cube.
    */
   double maxValue() const { return m_maxValue; }
 
-  void setName(QString name) { m_name = name; }
+  void setName(const QString &name) { m_name = name; }
   QString name() const { return m_name; }
 
   void setCubeType(Type type) { m_cubeType = type; }
-  Type cubeType() { return m_cubeType; }
+  Type cubeType() const { return m_cubeType; }
 
   /**
    * Provides locking.

@@ -25,7 +25,7 @@
 
 class QString;
 
-namespace openqube
+namespace OpenQube
 {
 class OPENQUBE_EXPORT GAMESSUSOutput
 {
