@@ -23,7 +23,6 @@
 
 #include <vector>
 #include <Eigen/Core>
-#include <QtCore/QString>
 
 namespace OpenQube {
 
