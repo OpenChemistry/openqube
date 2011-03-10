@@ -41,7 +41,7 @@ public:
    * @note The atom belongs to the molecule.
    */
   Atom addAtom(const Eigen::Vector3d &pos = Eigen::Vector3d::Zero(),
-                 short atomicNumber = 0);
+               short atomicNumber = 0);
 
   /** Get a pointer to the specified atom.
    * @param index The index of the atom in the molecule.
