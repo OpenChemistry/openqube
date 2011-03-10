@@ -1,10 +1,12 @@
-find_package(Qt4 4.6.3 REQUIRED)
+find_package(Qt4 4.6 REQUIRED)
 find_package(Eigen2 REQUIRED)
 
 include_directories(${QT_INCLUDE_DIR} ${EIGEN2_INCLUDE_DIR})
 
 # Source files for our data.
 set(openqube_SRCS
+  atom.cpp
+  basisset.h
   basissetloader.cpp
   cube.cpp
   gamessukout.cpp
@@ -12,6 +14,7 @@ set(openqube_SRCS
   gaussianfchk.cpp
   gaussianset.cpp
   molden.cpp
+  molecule.cpp
   mopacaux.cpp
   slaterset.cpp
 )

@@ -4,5 +4,8 @@ project(openqube)
 
 set(CMAKE_MODULE_PATH "${openqube_SOURCE_DIR}/cmake")
 
-add_subdirectory(src)
+include(CTest)
+enable_testing()
 
+add_subdirectory(src)
+add_subdirectory(tools)
