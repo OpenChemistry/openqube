@@ -32,3 +32,5 @@ set_target_properties(openqube PROPERTIES
 target_link_libraries(openqube ${QT_QTCORE_LIBRARY})
 
 install(TARGETS openqube DESTINATION lib)
+
+add_subdirectory(testing)
