@@ -20,11 +20,6 @@ using Eigen::Vector3d;
 
 namespace OpenQube {
 
-Atom::Atom(Molecule *molecule, size_t index) : m_molecule(molecule),
-  m_index(index)
-{
-}
-
 short Atom::atomicNumber() const
 {
   return m_molecule ? m_molecule->atomAtomicNumber(m_index) : -1;

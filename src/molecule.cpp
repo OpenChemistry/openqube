@@ -32,32 +32,33 @@ Molecule::~Molecule()
 Atom Molecule::addAtom(const Eigen::Vector3d &pos, short atomicNumber)
 {
   // Increment the vectors containing atomic properties.
-  m_atoms.push_back(Atom(this, m_atoms.size()));
   m_atomicNumbers.push_back(atomicNumber);
   for (size_t i = 0; i < m_atomPositions.size(); ++i)
     m_atomPositions[i].push_back(pos);
-  return m_atoms.back();
+  return Atom(this, m_atomicNumbers.size() - 1);
 }
 
 const Atom Molecule::atom(size_t index) const
 {
-  if (index < m_atoms.size())
-    return m_atoms[index];
+  // The const_cast is needed to create the temporary. As we are returning
+  // a const Atom object and Atom is const safe this should be fine.
+  if (index < m_atomicNumbers.size())
+    return Atom(const_cast<Molecule *>(this), index);
   else
     return Atom(0, 0);
 }
 
 Atom Molecule::atom(size_t index)
 {
-  if (index < m_atoms.size())
-    return m_atoms[index];
+  if (index < m_atomicNumbers.size())
+    return Atom(this, index);
   else
     return Atom(0, 0);
 }
 
 short Molecule::atomAtomicNumber(size_t index) const
 {
-  if (index < m_atoms.size())
+  if (index < m_atomicNumbers.size())
     return m_atomicNumbers[index];
   else
     return 0;
@@ -65,7 +66,7 @@ short Molecule::atomAtomicNumber(size_t index) const
 
 void Molecule::setAtomAtomicNumber(size_t index, short atomicNumber)
 {
-  if (index < m_atoms.size())
+  if (index < m_atomicNumbers.size())
     m_atomicNumbers[index] = atomicNumber;
 }
 

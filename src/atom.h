@@ -66,6 +66,11 @@ protected:
   Molecule *m_molecule;
 };
 
+inline Atom::Atom(Molecule *molecule, size_t index) : m_molecule(molecule),
+  m_index(index)
+{
+}
+
 } // End namespace
 
 #endif

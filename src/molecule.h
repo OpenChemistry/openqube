@@ -82,11 +82,9 @@ public:
   /**
    * @return The total number of atoms in the molecule.
    */
-  size_t numAtoms() const { return m_atoms.size(); }
+  size_t numAtoms() const { return m_atomicNumbers.size(); }
 
 protected:
-  /** Container of all Atom objects in the molecule. */
-  std::vector<Atom> m_atoms;
   /** Container of all atomic numbers for Atom objects in the molecule. */
   std::vector<short> m_atomicNumbers;
   /** Container of all atomic coordinates for the molecule. */
