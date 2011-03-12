@@ -28,6 +28,11 @@ void checkResult(const A& result, const B& expected, bool &error)
 
 }
 
+short testAtomConst(const Molecule& mol, size_t index)
+{
+  return mol.atom(index).atomicNumber();
+}
+
 int testatom(int argc, char *argv[])
 {
   bool error = false;
@@ -55,6 +60,16 @@ int testatom(int argc, char *argv[])
   checkResult(a2.pos(), Vector3d::Zero(), error);
 
   cout << "Number of atoms = " << mol.numAtoms() << endl;
+
+  Atom carbon = mol.addAtom(Vector3d::Zero(), 6);
+
+  cout << "Number of atoms = " << mol.numAtoms() << endl;
+
+  const Atom carbonCopy = mol.atom(1);
+  checkResult(carbon.atomicNumber(), carbonCopy.atomicNumber(), error);
+  checkResult(carbon.atomicNumber(), testAtomConst(mol, 1), error);
+  carbon.setAtomicNumber(7);
+  checkResult(carbon.atomicNumber(), carbonCopy.atomicNumber(), error);
 
   return error ? 1 : 0;
 }
