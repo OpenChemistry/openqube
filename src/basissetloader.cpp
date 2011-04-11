@@ -58,6 +58,10 @@ QString BasisSetLoader::MatchBasisSet(const QString& filename)
         || completeSuffix.contains("fck", Qt::CaseInsensitive)) {
       return fullFileName;
     }
+    else if (completeSuffix.contains("gamout", Qt::CaseInsensitive)
+             || completeSuffix.contains("gamess", Qt::CaseInsensitive)) {
+      return fullFileName;
+    }
     else if (completeSuffix.contains("gukout", Qt::CaseInsensitive)) {
       return fullFileName;
     }
@@ -68,9 +72,6 @@ QString BasisSetLoader::MatchBasisSet(const QString& filename)
         || completeSuffix.contains("mold", Qt::CaseInsensitive)
         || completeSuffix.contains("molf", Qt::CaseInsensitive)) {
      return fullFileName;
-    }
-    else if (completeSuffix.contains("gamess", Qt::CaseInsensitive)) {
-      return fullFileName;
     }
   }
   return matchedFile;
@@ -89,6 +90,12 @@ BasisSet * BasisSetLoader::LoadBasisSet(const QString& filename)
 
     return gaussian;
   }
+  else if (completeSuffix.contains("gamout", Qt::CaseInsensitive)
+           || completeSuffix.contains("gamess", Qt::CaseInsensitive)) {
+    GaussianSet *gaussian = new GaussianSet;
+    GAMESSUSOutput gamout(filename, gaussian);
+    return gaussian;
+  }
   else if (completeSuffix.contains("gukout", Qt::CaseInsensitive)) {
     GaussianSet *gaussian = new GaussianSet;
     GamessukOut gukout(filename, gaussian);
@@ -105,11 +112,6 @@ BasisSet * BasisSetLoader::LoadBasisSet(const QString& filename)
    GaussianSet *gaussian = new GaussianSet;
    MoldenFile mold(filename, gaussian);
    return gaussian;
-  }
-  else if (completeSuffix.contains("gamess", Qt::CaseInsensitive)) {
-    GaussianSet *gaussian = new GaussianSet;
-    GAMESSUSOutput(filename, gaussian);
-    return gaussian;
   }
 
   return 0;
