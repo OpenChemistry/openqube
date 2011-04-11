@@ -1,0 +1,18 @@
+# OpenQube CMake configuration file - http://avogadro.openmolecules.net/
+
+# If this file was found, then OpenQube has been found
+set(OpenQube_FOUND 1)
+
+set(OpenQube_VERSION_MAJOR   "@OpenQube_VERSION_MAJOR@")
+set(OpenQube_VERSION_MINOR   "@OpenQube_VERSION_MINOR@")
+set(OpenQube_VERSION_PATCH   "@OpenQube_VERSION_PATCH@")
+set(OpenQube_VERSION         "${OpenQube_VERSION_MAJOR}.${OpenQube_VERSION_MINOR}.${OpenQube_VERSION_PATCH}")
+
+set(OpenQube_INSTALL_PREFIX  "@CMAKE_INSTALL_PREFIX@")
+set(OpenQube_INCLUDE_DIRS    "${OpenQube_INSTALL_PREFIX}/@INC_INSTALL_DIR@")
+set(OpenQube_LIBRARY_DIRS    "${OpenQube_INSTALL_PREFIX}/@LIB_INSTALL_DIR@@LIB_SUFFIX@")
+set(OpenQube_BIN_DIRS        "${OpenQube_INSTALL_PREFIX}/@BIN_INSTALL_DIR@")
+
+if(NOT TARGET OpenQube)
+  include("${OpenQube_LIBRARY_DIRS}/openqube/OpenQubeTargets.cmake")
+endif()

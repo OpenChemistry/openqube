@@ -8,7 +8,7 @@ set(MyTests
 create_test_sourcelist(Tests OpenQubeTests.cxx ${MyTests})
 
 add_executable(OpenQubeTests ${Tests})
-target_link_libraries(OpenQubeTests openqube)
+target_link_libraries(OpenQubeTests OpenQube)
 
 foreach(test ${MyTests})
   message("Adding test ${test}...")
