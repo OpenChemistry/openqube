@@ -46,7 +46,7 @@ public:
   /**
    * Constructor.
    */
-  BasisSet() : m_electrons(0) {}
+  BasisSet() : m_electrons(0), m_valid(true) {}
 
   /**
    * Destructor.
@@ -96,6 +96,18 @@ public:
   }
 
   /**
+   * Set the number of electrons in the BasisSet.
+   * @param valid True if the basis set is valid, false otherwise.
+   */
+  void setIsValid(bool valid) { m_valid = valid; }
+
+  /**
+   * @return True of the basis set is valid, false otherwise.
+   * Default is true, if false then the basis set is likely unusable.
+   */
+  bool isValid() { return m_valid; }
+
+  /**
    * Calculate the MO over the entire range of the supplied Cube.
    * @param cube The cube to write the values of the MO into.
    * @param mo The molecular orbital number to calculate.
@@ -119,6 +131,11 @@ public:
 protected:
   /// Total number of electrons
   unsigned int m_electrons;
+
+  /** Is the loaded basis set valid? Allows us to mark a basis set invalid if we
+   * were not able to interpret part of it.
+   */
+  bool m_valid;
 
 };
 
