@@ -29,9 +29,9 @@ add_subdirectory(src)
 configure_file("${OpenQube_SOURCE_DIR}/cmake/OpenQubeConfig.cmake.in"
   "${OpenQube_BINARY_DIR}/OpenQubeConfig.cmake" @ONLY)
 install(FILES "${OpenQube_BINARY_DIR}/OpenQubeConfig.cmake"
-  DESTINATION "${LIB_INSTALL_DIR}/openqube")
+  DESTINATION "${LIB_INSTALL_DIR}/cmake/openqube")
 
 configure_file("${OpenQube_SOURCE_DIR}/cmake/OpenQubeConfigVersion.cmake.in"
   "${OpenQube_BINARY_DIR}/OpenQubeConfigVersion.cmake" @ONLY)
 install(FILES "${OpenQube_BINARY_DIR}/OpenQubeConfigVersion.cmake"
-  DESTINATION "${LIB_INSTALL_DIR}/openqube")
+  DESTINATION "${LIB_INSTALL_DIR}/cmake/openqube")

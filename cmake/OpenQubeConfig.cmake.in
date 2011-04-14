@@ -14,5 +14,5 @@ set(OpenQube_LIBRARY_DIRS    "${OpenQube_INSTALL_PREFIX}/@LIB_INSTALL_DIR@@LIB_S
 set(OpenQube_BIN_DIRS        "${OpenQube_INSTALL_PREFIX}/@BIN_INSTALL_DIR@")
 
 if(NOT TARGET OpenQube)
-  include("${OpenQube_LIBRARY_DIRS}/openqube/OpenQubeTargets.cmake")
+  include("${OpenQube_LIBRARY_DIRS}/cmake/openqube/OpenQubeTargets.cmake")
 endif()

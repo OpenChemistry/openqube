@@ -48,7 +48,7 @@ target_link_libraries(OpenQube ${QT_QTCORE_LIBRARY})
 install(TARGETS OpenQube
   EXPORT "OpenQubeTargets"
   DESTINATION "${LIB_INSTALL_DIR}")
-install(EXPORT OpenQubeTargets DESTINATION "${LIB_INSTALL_DIR}/openqube")
+install(EXPORT OpenQubeTargets DESTINATION "${LIB_INSTALL_DIR}/cmake/openqube")
 # Install the headers for the public API
 install(FILES ${openqube_HDRS} DESTINATION "${INC_INSTALL_DIR}/openqube")
 
