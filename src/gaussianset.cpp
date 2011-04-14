@@ -50,7 +50,8 @@ struct GaussianShell
 static const double BOHR_TO_ANGSTROM = 0.529177249;
 static const double ANGSTROM_TO_BOHR = 1.0 / BOHR_TO_ANGSTROM;
 
-GaussianSet::GaussianSet() : m_numMOs(0), m_init(false)
+GaussianSet::GaussianSet() : m_numMOs(0), m_numAtoms(0), m_init(false),
+  m_cube(0), m_gaussianShells(0)
 {
 }
 
@@ -318,7 +319,6 @@ void GaussianSet::initCalculation()
     }
   }
   m_init = true;
-  outputAll();
 }
 
 /// This is the stuff we actually use right now - porting to new data structure
@@ -673,6 +673,14 @@ void GaussianSet::outputAll()
 {
   // Can be called to print out a summary of the basis set as read in
   qDebug() << "\nGaussian Basis Set\nNumber of atoms:" << m_numAtoms;
+
+  initCalculation();
+
+  if (!isValid()) {
+    qDebug() << "Basis set is marked as invalid.";
+    return;
+  }
+
   for (uint i = 0; i < m_symmetry.size(); ++i) {
     qDebug() << i
              << "\tAtom Index:" << m_atomIndices[i]
@@ -680,8 +688,10 @@ void GaussianSet::outputAll()
              << "\tMO Index:" << m_moIndices[i]
              << "\tGTO Index:" << m_gtoIndices[i];
   }
-  qDebug() << m_symmetry.size() << m_gtoIndices.size()
-           << m_gtoIndices[m_symmetry.size()];
+  qDebug() << "Symmetry:" << m_symmetry.size()
+           << "\tgtoIndices:" << m_gtoIndices.size()
+           << "\tLast gtoIndex:" << m_gtoIndices[m_symmetry.size()]
+           << "\ngto size:" << m_gtoA.size() << m_gtoC.size() << m_gtoCN.size();
   for (uint i = 0; i < m_symmetry.size(); ++i) {
     switch(m_symmetry[i]) {
     case S:
@@ -705,25 +715,41 @@ void GaussianSet::outputAll()
                << "\t" << m_moMatrix(0, m_moIndices[i] + 5);
       break;
     case D5:
-      qDebug() << "Shell" << i << "\tD\n  MO 1\t"
+      qDebug() << "Shell" << i << "\tD5\n  MO 1\t"
                << m_moMatrix(0, m_moIndices[i])
                << "\t" << m_moMatrix(0, m_moIndices[i] + 1)
                << "\t" << m_moMatrix(0, m_moIndices[i] + 2)
                << "\t" << m_moMatrix(0, m_moIndices[i] + 3)
                << "\t" << m_moMatrix(0, m_moIndices[i] + 4);
       break;
+    case F:
+      std::cout << "Shell " << i << "\tF7\n  MO 1";
+      for (short j = 0; j < 8; ++j)
+        std::cout << "\t" << m_moMatrix(0, m_moIndices[i] + j);
+      std::cout << std::endl;
+      break;
+    case F7:
+      std::cout << "Shell " << i << "\tF7\n  MO 1";
+      for (short j = 0; j < 7; ++j)
+        std::cout << "\t" << m_moMatrix(0, m_moIndices[i] + j);
+      std::cout << std::endl;
+      break;
     default:
       qDebug() << "Error: unhandled type...";
     }
     unsigned int cIndex = m_gtoIndices[i];
     for (uint j = m_gtoIndices[i]; j < m_gtoIndices[i+1]; ++j) {
+      if (j >= m_gtoA.size()) {
+        qDebug() << "Error, j is too large!" << j << m_gtoA.size();
+        continue;
+      }
       qDebug() << cIndex
                << "\tc:" << m_gtoC[cIndex]
                << "\ta:" << m_gtoA[cIndex];
       ++cIndex;
     }
   }
-  qDebug() << '\n';
+  qDebug() << "\nEnd of orbital data...\n";
 }
 
 }
