@@ -28,7 +28,7 @@ namespace OpenQube {
 
 class Atom;
 
-class Molecule
+class OPENQUBE_EXPORT Molecule
 {
 public:
   /** Default contructor to create an empty molecule object. */

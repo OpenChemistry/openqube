@@ -25,7 +25,7 @@ namespace OpenQube {
 
 class Molecule;
 
-class Atom
+class OPENQUBE_EXPORT Atom
 {
 public:
   /** Is the Atom valid?
