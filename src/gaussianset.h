@@ -154,7 +154,6 @@ private slots:
 
 private:
   // New storage of the data
-  std::vector<Eigen::Vector3d> m_atomPos;  //! Atom position vectors
   std::vector<int> m_symmetry;             //! Symmetry of the basis, S, P...
   std::vector<unsigned int> m_atomIndices; //! Indices into the atomPos vector
   std::vector<unsigned int> m_moIndices;   //! Indices into the MO/density matrix

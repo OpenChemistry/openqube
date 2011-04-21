@@ -71,5 +71,7 @@ int testatom(int argc, char *argv[])
   carbon.setAtomicNumber(7);
   checkResult(carbon.atomicNumber(), carbonCopy.atomicNumber(), error);
 
+  mol.print();
+
   return error ? 1 : 0;
 }

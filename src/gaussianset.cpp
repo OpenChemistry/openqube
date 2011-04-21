@@ -59,13 +59,13 @@ GaussianSet::~GaussianSet()
 {
 }
 
-unsigned int GaussianSet::addAtom(const Vector3d& pos, int)
+unsigned int GaussianSet::addAtom(const Vector3d& pos, int atomicNumber)
 {
   m_init = false;
   // Add to the new data structure, delete the old soon
-  m_atomPos.push_back(pos);
+  m_molecule.addAtom(pos, atomicNumber);
 
-  return m_atomPos.size() - 1;
+  return m_molecule.numAtoms() - 1;
 }
 
 unsigned int GaussianSet::addBasis(unsigned int atom, orbital type)
@@ -232,7 +232,7 @@ void GaussianSet::initCalculation()
   if (m_init)
     return;
   // This currently just involves normalising all contraction coefficients
-  m_numAtoms = m_atomPos.size();
+  m_numAtoms = m_molecule.numAtoms();
   m_gtoCN.clear();
 
   // Initialise the new data structures that are hopefully more efficient
@@ -340,7 +340,7 @@ void GaussianSet::processPoint(GaussianShell &shell)
 
   // Calculate the deltas for the position
   for (unsigned int i = 0; i < atomsSize; ++i) {
-    deltas.push_back(pos - set->m_atomPos[i]);
+    deltas.push_back(pos - set->m_molecule.atomPos(i));
     dr2.push_back(deltas[i].squaredNorm());
   }
 
@@ -389,7 +389,7 @@ void GaussianSet::processDensity(GaussianShell &shell)
   Vector3d pos = shell.tCube->position(shell.pos) * ANGSTROM_TO_BOHR;
   // Calculate the deltas for the position
   for (unsigned int i = 0; i < atomsSize; ++i) {
-    deltas.push_back(pos - set->m_atomPos[i]);
+    deltas.push_back(pos - set->m_molecule.atomPos(i));
     dr2.push_back(deltas[i].squaredNorm());
   }
 

@@ -20,6 +20,8 @@
 
 #include "openqubeabi.h"
 
+#include "molecule.h"
+
 #include <QtCore/QObject>
 #include <QtCore/QFutureWatcher>
 
@@ -63,6 +65,22 @@ public:
    * @return The number of electrons in the molecule.
    */
   unsigned int numElectrons() { return m_electrons; }
+
+  /**
+   * Set the molecule for the basis set.
+   */
+  void setMolecule(const Molecule &molecule) { m_molecule = molecule; }
+
+  /**
+   * Get the molecule for the basis set.
+   */
+  Molecule molecule() const { return m_molecule; }
+
+  /**
+   * Get a reference to the molecule.
+   */
+  Molecule & moleculeRef() { return m_molecule; }
+  const Molecule & moleculeRef() const { return m_molecule; }
 
   /**
    * @return The number of MOs in the BasisSet.
@@ -136,6 +154,12 @@ protected:
    * were not able to interpret part of it.
    */
   bool m_valid;
+
+  /** The Molecule holds the atoms (and possibly bonds) read in from the output
+   * file. Most basis sets have orbitals around these atoms, but this is not
+   * necessarily the case.
+   */
+  Molecule m_molecule;
 
 };
 

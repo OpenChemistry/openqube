@@ -84,6 +84,11 @@ public:
    */
   size_t numAtoms() const { return m_atomicNumbers.size(); }
 
+  /**
+   * Convenience function: print out a summary of the molecule.
+   */
+  void print() const;
+
 protected:
   /** Container of all atomic numbers for Atom objects in the molecule. */
   std::vector<short> m_atomicNumbers;

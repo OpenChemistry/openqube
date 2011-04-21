@@ -17,6 +17,8 @@
 #include "molecule.h"
 #include "atom.h"
 
+#include <QtCore/QDebug>
+
 using Eigen::Vector3d;
 
 namespace OpenQube {
@@ -82,6 +84,23 @@ void Molecule::setAtomPos(size_t atomIndex, const Eigen::Vector3d& pos)
 {
   if (atomIndex < m_atomPositions[m_conformer].size())
     m_atomPositions[m_conformer][atomIndex] = pos;
+}
+
+void Molecule::clearAtoms()
+{
+  m_atomicNumbers.clear();
+  m_atomPositions.resize(1);
+  m_atomPositions[0].clear();
+}
+
+void Molecule::print() const
+{
+  qDebug() << "Number of atoms:" << m_atomicNumbers.size();
+  for (size_t i = 0; i < m_atomicNumbers.size(); ++i) {
+    qDebug() << "Atom" << i << ":" << m_atomicNumbers[i]
+             << "->" << m_atomPositions[0][i].x() << m_atomPositions[0][i].y()
+             << m_atomPositions[0][i].z();
+  }
 }
 
 } // End namespace
