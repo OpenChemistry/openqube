@@ -12,6 +12,7 @@ set(openqube_HDRS
   gamessukout.h
   gamessus.h
   gaussianset.h
+  molecule.h
   openqubeabi.h
   slaterset.h
 )
