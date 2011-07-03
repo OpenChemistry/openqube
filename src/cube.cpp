@@ -263,6 +263,16 @@ bool Cube::setValue(int i, int j, int k, double value)
     return false;
 }
 
+void Cube::setName(const char *name)
+{
+  this->setName(QString(name));
+}
+
+const char * Cube::name_c_str() const
+{
+  return this->name().toStdString().c_str();
+}
+
 QReadWriteLock * Cube::lock() const
 {
   return m_lock;

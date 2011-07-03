@@ -190,6 +190,9 @@ public:
   void setName(const QString &name) { m_name = name; }
   QString name() const { return m_name; }
 
+  void setName(const char *name);
+  const char * name_c_str() const;
+
   void setCubeType(Type type) { m_cubeType = type; }
   Type cubeType() const { return m_cubeType; }
 
