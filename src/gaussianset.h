@@ -123,6 +123,9 @@ public:
   /**
    * Calculate the MO over the entire range of the supplied Cube.
    * @param cube The cube to write the values of the MO into.
+   * @note This function starts a threaded calculation. Use watcher()
+   * to monitor progress.
+   * @sa BasisSet::blockingCalculateCubeMO
    * @return True if the calculation was successful.
    */
   bool calculateCubeMO(Cube *cube, unsigned int state = 1);
@@ -130,6 +133,9 @@ public:
   /**
    * Calculate the electron density over the entire range of the supplied Cube.
    * @param cube The cube to write the values of the MO into.
+   * @note This function starts a threaded calculation. Use watcher()
+   * to monitor progress.
+   * @sa blockingCalculateCubeDensity
    * @return True if the calculation was successful.
    */
   bool calculateCubeDensity(Cube *cube);

@@ -20,7 +20,7 @@ set(openqube_HDRS
 # Source files for our data.
 set(openqube_SRCS
   atom.cpp
-  basisset.h
+  basisset.cpp
   basissetloader.cpp
   cube.cpp
   gamessukout.cpp
