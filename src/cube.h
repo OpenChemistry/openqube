@@ -100,6 +100,14 @@ public:
   bool setLimits(const Cube &cube);
 
   /**
+   * Set the limits of the cube.
+   * @param mol Molecule to take limits from
+   * @param spacing The spacing of the regular grid
+   * @param padding Padding around the molecule
+   */
+  bool setLimits(const Molecule &mol, double spacing, double padding);
+
+  /**
    * @return Vector containing all the data in a one-dimensional array.
    */
   std::vector<double> * data();
