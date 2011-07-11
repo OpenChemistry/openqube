@@ -210,6 +210,29 @@ bool GaussianSet::calculateCubeDensity(Cube *cube)
   return true;
 }
 
+BasisSet * GaussianSet::clone()
+{
+  GaussianSet *result = new GaussianSet();
+
+  result->m_symmetry = this->m_symmetry;
+  result->m_atomIndices = this->m_atomIndices;
+  result->m_moIndices = this->m_moIndices;
+  result->m_gtoIndices = this->m_gtoIndices;
+  result->m_cIndices = this->m_cIndices;
+  result->m_gtoA = this->m_gtoA;
+  result->m_gtoC = this->m_gtoC;
+  result->m_gtoCN = this->m_gtoCN;
+  result->m_moMatrix = this->m_moMatrix;
+  result->m_density = this->m_density;
+
+  result->m_numMOs = this->m_numMOs;
+  result->m_numAtoms = this->m_numAtoms;
+  result->m_init = this->m_init;
+
+  // Skip tmp vars
+  return result;
+}
+
 void GaussianSet::calculationComplete()
 {
   disconnect(&m_watcher, SIGNAL(finished()), this, SLOT(calculationComplete()));
