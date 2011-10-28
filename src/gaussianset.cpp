@@ -237,6 +237,8 @@ void GaussianSet::initCalculation()
 
   // Initialise the new data structures that are hopefully more efficient
   unsigned int indexMO = 0;
+  unsigned int skip = 0; // for unimplemented shells
+
   m_moIndices.resize(m_symmetry.size());
   // Add a final entry to the gtoIndices
   m_gtoIndices.push_back(m_gtoA.size());
@@ -303,17 +305,28 @@ void GaussianSet::initCalculation()
       }
       break;
     case F:
-      m_moIndices[i] = indexMO;
-      indexMO += 8;
-      m_cIndices.push_back(m_gtoCN.size());
-      qDebug() << "F Basis set not handled - results may be incorrect.";
-      break;
+      skip = 10;
     case F7:
+      skip = 7;
+    case G:
+      skip = 15;
+    case G9:
+      skip = 9;
+    case H:
+      skip = 21;
+    case H11:
+      skip = 11;
+    case I:
+      skip = 28;
+    case I13:
+      skip = 13;
+
       m_moIndices[i] = indexMO;
-      indexMO += 7;
+      indexMO += skip;
       m_cIndices.push_back(m_gtoCN.size());
-      qDebug() << "F7 Basis set not handled - results may be incorrect.";
+      qDebug() << "Basis set not handled - results may be incorrect.";
       break;
+
     default:
       qDebug() << "Basis set not handled - results may be incorrect.";
     }
@@ -723,8 +736,8 @@ void GaussianSet::outputAll()
                << "\t" << m_moMatrix(0, m_moIndices[i] + 4);
       break;
     case F:
-      std::cout << "Shell " << i << "\tF7\n  MO 1";
-      for (short j = 0; j < 8; ++j)
+      std::cout << "Shell " << i << "\tF\n  MO 1";
+      for (short j = 0; j < 10; ++j)
         std::cout << "\t" << m_moMatrix(0, m_moIndices[i] + j);
       std::cout << std::endl;
       break;
