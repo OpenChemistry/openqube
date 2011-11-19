@@ -129,16 +129,39 @@ public:
    * Calculate the MO over the entire range of the supplied Cube.
    * @param cube The cube to write the values of the MO into.
    * @param mo The molecular orbital number to calculate.
+   * @note This function starts a threaded calculation. Use watcher() to
+   * monitor progress.
+   * @sa blockingCalculateCubeMO
    * @return True if the calculation was successful.
    */
   virtual bool calculateCubeMO(Cube *cube, unsigned int mo = 1) = 0;
 
   /**
+   * Calculate the MO over the entire range of the supplied Cube.
+   * @param cube The cube to write the values of the MO into.
+   * @param mo The molecular orbital number to calculate.
+   * @sa calculateCubeMO
+   * @return True if the calculation was successful.
+   */
+  virtual bool blockingCalculateCubeMO(Cube *cube, unsigned int mo = 1);
+
+  /**
    * Calculate the electron density over the entire range of the supplied Cube.
    * @param cube The cube to write the values of the MO into.
+   * @note This function starts a threaded calculation. Use watcher() to
+   * monitor progress.
+   * @sa blockingCalculateCubeDensity
    * @return True if the calculation was successful.
    */
   virtual bool calculateCubeDensity(Cube *cube) = 0;
+
+  /**
+   * Calculate the electron density over the entire range of the supplied Cube.
+   * @param cube The cube to write the values of the MO into.
+   * @sa calculateCubeDensity
+   * @return True if the calculation was successful.
+   */
+  virtual bool blockingCalculateCubeDensity(Cube *cube);
 
   /**
    * When performing a calculation the QFutureWatcher is useful if you want
