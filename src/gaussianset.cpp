@@ -182,6 +182,11 @@ bool GaussianSet::calculateCubeMO(Cube *cube, unsigned int state)
 
 bool GaussianSet::calculateCubeDensity(Cube *cube)
 {
+  if (m_density.size() == 0) {
+    qDebug() << "Cannot calculate density -- density matrix not set.";
+    return false;
+  }
+
   // FIXME Still not working, committed so others could see current state.
 
   // Must be called before calculations begin
