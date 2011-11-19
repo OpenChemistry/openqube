@@ -77,6 +77,17 @@ QString BasisSetLoader::MatchBasisSet(const QString& filename)
   return matchedFile;
 }
 
+void BasisSetLoader::MatchBasisSet(const char* filename, char *basisName )
+{
+   QString qBasisName = BasisSetLoader::MatchBasisSet(filename);
+   int i = 0;
+   while (i < qBasisName.size()) {
+     basisName[i] = qBasisName[i].toLatin1();
+     ++i;
+   }
+   basisName[i] = 0;
+}
+
 BasisSet * BasisSetLoader::LoadBasisSet(const QString& filename)
 {
   // Here we assume that the file name is correct, and attempt to load it.
@@ -115,6 +126,11 @@ BasisSet * BasisSetLoader::LoadBasisSet(const QString& filename)
   }
 
   return 0;
+}
+
+BasisSet * BasisSetLoader::LoadBasisSet(const char *filename)
+{
+  return BasisSetLoader::LoadBasisSet(QString(filename));
 }
 
 } // End namespace
