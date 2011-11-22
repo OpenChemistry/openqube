@@ -169,6 +169,11 @@ public:
    */
   virtual QFutureWatcher<void> & watcher()=0;
 
+  /**
+   * Create a deep copy of @a this and return a pointer to it.
+   */
+  virtual BasisSet * clone() = 0;
+
 protected:
   /// Total number of electrons
   unsigned int m_electrons;
