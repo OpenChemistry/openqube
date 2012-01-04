@@ -28,6 +28,8 @@ class QReadWriteLock;
 
 namespace OpenQube {
 
+class Molecule;
+
 class OPENQUBE_EXPORT Cube
 {
 public:
