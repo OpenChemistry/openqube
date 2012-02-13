@@ -15,11 +15,11 @@
 ******************************************************************************/
 
 #include "gamessukout.h"
+#include <fstream>
+#include <iostream>
 
 using Eigen::Vector3d;
 using std::vector;
-
-#include <fstream>
 
 namespace OpenQube
 {

@@ -1,7 +1,7 @@
 find_package(Qt4 4.6 REQUIRED)
-find_package(Eigen2 REQUIRED)
+find_package(Eigen3 REQUIRED)
 
-include_directories(${QT_INCLUDE_DIR} ${EIGEN2_INCLUDE_DIR})
+include_directories(${QT_INCLUDE_DIR} ${EIGEN3_INCLUDE_DIR})
 
 # Headers for our public API
 set(openqube_HDRS
