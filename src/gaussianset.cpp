@@ -25,6 +25,7 @@
 #include "cube.h"
 
 #include <cmath>
+#include <iostream>
 
 #include <QtCore/QtConcurrentMap>
 #include <QtCore/QFuture>

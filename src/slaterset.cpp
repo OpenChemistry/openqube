@@ -23,7 +23,8 @@
 
 #include "cube.h"
 
-#include <Eigen/Array>
+//#include <Eigen/Array>
+#include <Eigen/Eigenvalues>
 #include <Eigen/LU>
 #include <Eigen/QR>
 
@@ -248,7 +249,8 @@ bool SlaterSet::initialize()
 
   SelfAdjointEigenSolver<MatrixXd> s(m_overlap);
   MatrixXd p = s.eigenvectors();
-  MatrixXd m = p * s.eigenvalues().cwise().inverse().cwise().sqrt().asDiagonal() * p.inverse();
+  MatrixXd m = p * s.eigenvalues().array().inverse().array().sqrt()
+                    .matrix().asDiagonal() * p.inverse();
   m_normalized = m * m_eigenVectors;
 
   if (!(m_overlap*m*m).isIdentity())
