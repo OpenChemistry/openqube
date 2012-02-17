@@ -170,6 +170,9 @@ bool GaussianSet::calculateCubeMO(Cube *cube, unsigned int state)
   // Lock the cube until we are done.
   cube->lock()->lockForWrite();
 
+  // Set the cube type
+  cube->setCubeType(Cube::MO);
+
   // Watch for the future
   connect(&m_watcher, SIGNAL(finished()), this, SLOT(calculationComplete()));
 
@@ -204,6 +207,9 @@ bool GaussianSet::calculateCubeDensity(Cube *cube)
 
   // Lock the cube until we are done.
   cube->lock()->lockForWrite();
+
+  // Set the cube type
+  cube->setCubeType(Cube::ElectronDensity);
 
   // Watch for the future
   connect(&m_watcher, SIGNAL(finished()), this, SLOT(calculationComplete()));
