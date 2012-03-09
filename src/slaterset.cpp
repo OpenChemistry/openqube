@@ -259,7 +259,7 @@ bool SlaterSet::initialize()
                     .matrix().asDiagonal() * p.inverse();
   m_normalized = m * m_eigenVectors;
 
-  if (!(m_overlap*m*m).isIdentity())
+  if (!(m_overlap*m*m).eval().isIdentity())
     qDebug() << "Identity test FAILED - do you need a newer version of Eigen?";
   //    std::cout << m_normalized << std::endl << std::endl;
   //    std::cout << s.eigenvalues() << std::endl << std::endl;
