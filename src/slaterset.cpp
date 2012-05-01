@@ -119,7 +119,7 @@ bool SlaterSet::addDensityMatrix(const Eigen::MatrixXd &d)
 
 unsigned int SlaterSet::numMOs()
 {
-  return m_overlap.cols();
+  return static_cast<unsigned int>(m_overlap.cols());
 }
 
 inline bool SlaterSet::isSmall(double val)
@@ -155,7 +155,7 @@ bool SlaterSet::calculateCubeMO(Cube *cube, unsigned int state)
   // It is more efficient to process each shell over the entire cube than it
   // is to process each MO at each point in the cube. This is probably the best
   // point at which to multithread too - QtConcurrent!
-  m_slaterShells.resize(cube->data()->size());
+  m_slaterShells.resize(static_cast<int>(cube->data()->size()));
 
   qDebug() << "Number of points:" << m_slaterShells.size();
 
@@ -193,7 +193,7 @@ bool SlaterSet::calculateCubeDensity(Cube *cube)
   // It is more efficient to process each shell over the entire cube than it
   // is to process each MO at each point in the cube. This is probably the best
   // point at which to multithread too - QtConcurrent!
-  m_slaterShells.resize(cube->data()->size());
+  m_slaterShells.resize(static_cast<int>(cube->data()->size()));
 
   qDebug() << "Number of points for density:" << m_slaterShells.size();
 
@@ -320,8 +320,8 @@ bool SlaterSet::initialize()
 void SlaterSet::processPoint(SlaterShell &shell)
 {
   SlaterSet *set = shell.set;
-  unsigned int atomsSize = set->m_atomPos.size();
-  unsigned int basisSize = set->m_zetas.size();
+  unsigned int atomsSize = static_cast<unsigned int>(set->m_atomPos.size());
+  unsigned int basisSize = static_cast<unsigned int>(set->m_zetas.size());
 
   vector<Vector3d> deltas;
   vector<double> dr;
@@ -354,9 +354,9 @@ void SlaterSet::processDensity(SlaterShell &shell)
 {
   // Calculate the electron density
   SlaterSet *set = shell.set;
-  unsigned int atomsSize = set->m_atomPos.size();
-  unsigned int basisSize = set->m_zetas.size();
-  unsigned int matrixSize = set->m_density.rows();
+  unsigned int atomsSize = static_cast<unsigned int>(set->m_atomPos.size());
+  unsigned int basisSize = static_cast<unsigned int>(set->m_zetas.size());
+  unsigned int matrixSize = static_cast<unsigned int>(set->m_density.rows());
 
   vector<Vector3d> deltas;
   vector<double> dr;
