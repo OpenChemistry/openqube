@@ -64,9 +64,9 @@ unsigned int GaussianSet::addAtom(const Vector3d& pos, int atomicNumber)
 {
   m_init = false;
   // Add to the new data structure, delete the old soon
-  m_molecule.addAtom(pos, atomicNumber);
+  m_molecule.addAtom(pos, static_cast<short>(atomicNumber));
 
-  return m_molecule.numAtoms() - 1;
+  return static_cast<unsigned int>(m_molecule.numAtoms() - 1);
 }
 
 unsigned int GaussianSet::addBasis(unsigned int atom, orbital type)
@@ -103,7 +103,7 @@ unsigned int GaussianSet::addBasis(unsigned int atom, orbital type)
   // Add to the new data structure, delete the old soon
   m_symmetry.push_back(type);
   m_atomIndices.push_back(atom);
-  return m_symmetry.size() - 1;
+  return static_cast<unsigned int>(m_symmetry.size() - 1);
 }
 
 unsigned int GaussianSet::addGTO(unsigned int, double c, double a)
@@ -111,12 +111,12 @@ unsigned int GaussianSet::addGTO(unsigned int, double c, double a)
   // Use the new data structure
   if (m_gtoIndices.size() < m_atomIndices.size()) {
     // First GTO added for this basis - add the gto index
-    m_gtoIndices.push_back(m_gtoA.size());
+    m_gtoIndices.push_back(static_cast<unsigned int>(m_gtoA.size()));
   }
   m_gtoA.push_back(a);
   m_gtoC.push_back(c);
 
-  return m_gtoA.size() - 1;
+  return static_cast<unsigned int>(m_gtoA.size() - 1);
 }
 
 void GaussianSet::addMOs(const vector<double>& MOs)
@@ -125,7 +125,7 @@ void GaussianSet::addMOs(const vector<double>& MOs)
 
   // Some programs don't output all MOs, so we take the amount of data
   // and divide by the # of AO functions
-  unsigned int columns = MOs.size() / m_numMOs;
+  unsigned int columns = static_cast<unsigned int>(MOs.size()) / m_numMOs;
   qDebug() << " add MOs: " << m_numMOs << columns;
 
   m_moMatrix.resize(m_numMOs, m_numMOs);
@@ -158,7 +158,8 @@ bool GaussianSet::calculateCubeMO(Cube *cube, unsigned int state)
   initCalculation();
 
   // Set up the points we want to calculate the density at
-  m_gaussianShells = new QVector<GaussianShell>(cube->data()->size());
+  m_gaussianShells =
+    new QVector<GaussianShell>(static_cast<int>(cube->data()->size()));
 
   for (int i = 0; i < m_gaussianShells->size(); ++i) {
     (*m_gaussianShells)[i].set = this;
@@ -197,7 +198,8 @@ bool GaussianSet::calculateCubeDensity(Cube *cube)
   initCalculation();
 
   // Set up the points we want to calculate the density at
-  m_gaussianShells = new QVector<GaussianShell>(cube->data()->size());
+  m_gaussianShells =
+    new QVector<GaussianShell>(static_cast<int>(cube->data()->size()));
 
   for (int i = 0; i < m_gaussianShells->size(); ++i) {
     (*m_gaussianShells)[i].set = this;
@@ -267,7 +269,7 @@ void GaussianSet::initCalculation()
   if (m_init)
     return;
   // This currently just involves normalising all contraction coefficients
-  m_numAtoms = m_molecule.numAtoms();
+  m_numAtoms = static_cast<unsigned int>(m_molecule.numAtoms());
   m_gtoCN.clear();
 
   // Initialise the new data structures that are hopefully more efficient
@@ -276,12 +278,12 @@ void GaussianSet::initCalculation()
 
   m_moIndices.resize(m_symmetry.size());
   // Add a final entry to the gtoIndices
-  m_gtoIndices.push_back(m_gtoA.size());
+  m_gtoIndices.push_back(static_cast<unsigned int>(m_gtoA.size()));
   for(unsigned int i = 0; i < m_symmetry.size(); ++i) {
     switch (m_symmetry[i]) {
     case S:
       m_moIndices[i] = indexMO++;
-      m_cIndices.push_back(m_gtoCN.size());
+      m_cIndices.push_back(static_cast<unsigned int>(m_gtoCN.size()));
       // Normalization of the S-type orbitals (normalization used in JMol)
       // (8 * alpha^3 / pi^3)^0.25 * exp(-alpha * r^2)
       for(unsigned j = m_gtoIndices[i]; j < m_gtoIndices[i+1]; ++j) {
@@ -291,7 +293,7 @@ void GaussianSet::initCalculation()
     case P:
       m_moIndices[i] = indexMO;
       indexMO += 3;
-      m_cIndices.push_back(m_gtoCN.size());
+      m_cIndices.push_back(static_cast<unsigned int>(m_gtoCN.size()));
       // Normalization of the P-type orbitals (normalization used in JMol)
       // (128 alpha^5 / pi^3)^0.25 * [x|y|z]exp(-alpha * r^2)
       for(unsigned j = m_gtoIndices[i]; j < m_gtoIndices[i+1]; ++j) {
@@ -305,7 +307,7 @@ void GaussianSet::initCalculation()
       // Order in xx, yy, zz, xy, xz, yz
       m_moIndices[i] = indexMO;
       indexMO += 6;
-      m_cIndices.push_back(m_gtoCN.size());
+      m_cIndices.push_back(static_cast<unsigned int>(m_gtoCN.size()));
       // Normalization of the P-type orbitals (normalization used in JMol)
       // xx|yy|zz: (2048 alpha^7/9pi^3)^0.25 [xx|yy|zz]exp(-alpha r^2)
       // xy|xz|yz: (2048 alpha^7/pi^3)^0.25 [xy|xz|yz]exp(-alpha r^2)
@@ -325,7 +327,7 @@ void GaussianSet::initCalculation()
       // Form d(z^2-r^2), dxz, dyz, d(x^2-y^2), dxy
       m_moIndices[i] = indexMO;
       indexMO += 5;
-      m_cIndices.push_back(m_gtoCN.size());
+      m_cIndices.push_back(static_cast<unsigned int>(m_gtoCN.size()));
       for(unsigned j = m_gtoIndices[i]; j < m_gtoIndices[i+1]; ++j) {
         m_gtoCN.push_back(m_gtoC[j] * pow(2048 * pow(m_gtoA[j], 7.0)
                                           / (9.0 * M_PI*M_PI*M_PI), 0.25));
@@ -358,7 +360,7 @@ void GaussianSet::initCalculation()
 
       m_moIndices[i] = indexMO;
       indexMO += skip;
-      m_cIndices.push_back(m_gtoCN.size());
+      m_cIndices.push_back(static_cast<unsigned int>(m_gtoCN.size()));
       qDebug() << "Basis set not handled - results may be incorrect.";
       break;
 
@@ -374,7 +376,7 @@ void GaussianSet::processPoint(GaussianShell &shell)
 {
   GaussianSet *set = shell.set;
   unsigned int atomsSize = set->m_numAtoms;
-  unsigned int basisSize = set->m_symmetry.size();
+  unsigned int basisSize = static_cast<unsigned int>(set->m_symmetry.size());
   std::vector<int> &basis = set->m_symmetry;
   vector<Vector3d> deltas;
   vector<double> dr2;
@@ -425,8 +427,8 @@ void GaussianSet::processDensity(GaussianShell &shell)
 {
   GaussianSet *set = shell.set;
   unsigned int atomsSize = set->m_numAtoms;
-  unsigned int basisSize = set->m_symmetry.size();
-  unsigned int matrixSize = set->m_density.rows();
+  unsigned int basisSize = static_cast<unsigned int>(set->m_symmetry.size());
+  unsigned int matrixSize = static_cast<unsigned int>(set->m_density.rows());
   std::vector<int> &basis = set->m_symmetry;
   vector<Vector3d> deltas;
   vector<double> dr2;
@@ -714,7 +716,7 @@ inline void GaussianSet::pointD5(GaussianSet *set, const Eigen::Vector3d &delta,
 unsigned int GaussianSet::numMOs()
 {
   // Return the total number of MOs
-  return m_moMatrix.rows();
+  return static_cast<unsigned int>(m_moMatrix.rows());
 }
 
 void GaussianSet::outputAll()
