@@ -1,7 +1,7 @@
 find_package(Qt4 4.6 REQUIRED)
 find_package(Eigen3 REQUIRED)
 
-include_directories(${QT_INCLUDE_DIR} ${EIGEN3_INCLUDE_DIR})
+include_directories(SYSTEM ${QT_INCLUDE_DIR} ${EIGEN3_INCLUDE_DIR})
 
 # Headers for our public API
 set(openqube_HDRS
@@ -35,7 +35,7 @@ set(openqube_SRCS
 
 qt4_wrap_cpp(openqubeMocSrcs basisset.h gaussianset.h slaterset.h)
 
-add_library(OpenQube SHARED ${openqube_SRCS} ${openqubeMocSrcs})
+add_library(OpenQube ${openqube_SRCS} ${openqubeMocSrcs})
 
 set_target_properties(OpenQube PROPERTIES
   VERSION ${OpenQube_VERSION}
@@ -48,9 +48,10 @@ target_link_libraries(OpenQube ${QT_QTCORE_LIBRARY})
 # Install the library
 install(TARGETS OpenQube
   EXPORT "OpenQubeTargets"
-  DESTINATION "${LIB_INSTALL_DIR}")
-install(EXPORT OpenQubeTargets DESTINATION "${LIB_INSTALL_DIR}/cmake/openqube")
+  DESTINATION "${INSTALL_LIBRARY_DIR}")
+install(EXPORT OpenQubeTargets DESTINATION
+  "${INSTALL_LIBRARY_DIR}/cmake/openqube")
 # Install the headers for the public API
-install(FILES ${openqube_HDRS} DESTINATION "${INC_INSTALL_DIR}/openqube")
+install(FILES ${openqube_HDRS} DESTINATION "${INSTALL_INCLUDE_DIR}/openqube")
 
 add_subdirectory(testing)
