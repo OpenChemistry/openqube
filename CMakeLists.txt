@@ -33,6 +33,12 @@ file(REMOVE "${Libraries_EXPORTS_FILE}")
 add_subdirectory(openqube)
 #add_subdirectory(tools)
 
+option(BUILD_DOCUMENTATION "Build project documentation" OFF)
+
+if(BUILD_DOCUMENTATION)
+  add_subdirectory(docs)
+endif()
+
 configure_file("${OpenQube_SOURCE_DIR}/cmake/OpenQubeConfig.cmake.in"
   "${OpenQube_BINARY_DIR}/OpenQubeConfig.cmake" @ONLY)
 install(FILES "${OpenQube_BINARY_DIR}/OpenQubeConfig.cmake"
