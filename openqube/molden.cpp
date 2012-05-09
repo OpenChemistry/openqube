@@ -163,6 +163,8 @@ void MoldenFile::processLine()
       } // finished parsing a new MO
 
       break;
+    default:
+      break;
     }
   }
 }

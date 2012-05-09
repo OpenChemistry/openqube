@@ -33,7 +33,7 @@ short testAtomConst(const Molecule& mol, size_t index)
   return mol.atom(index).atomicNumber();
 }
 
-int testatom(int argc, char *argv[])
+int testatom(int , char *[])
 {
   bool error = false;
   cout << "Testing the atom class..." << endl;

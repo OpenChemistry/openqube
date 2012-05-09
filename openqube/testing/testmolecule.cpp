@@ -23,7 +23,7 @@ bool checkResult(const A& result, const B& expected)
   return true;
 }
 
-int testmolecule(int argc, char *argv[])
+int testmolecule(int , char *[])
 {
   bool error = false;
   cout << "Testing the molecule class..." << endl;
@@ -31,7 +31,7 @@ int testmolecule(int argc, char *argv[])
   Molecule mol;
   mol.addAtom(Vector3d(0.0, 1.0, 0.0), 1);
 
-  if (!checkResult(mol.numAtoms(), 1))
+  if (!checkResult(mol.numAtoms(), static_cast<size_t>(1)))
     error = true;
 
   cout << "Number of atoms = " << mol.numAtoms() << endl;
