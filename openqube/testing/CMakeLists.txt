@@ -1,5 +1,3 @@
-include_directories(..)
-
 set(MyTests
   testatom
   testmolecule
@@ -8,7 +6,7 @@ set(MyTests
 create_test_sourcelist(Tests OpenQubeTests.cxx ${MyTests})
 
 add_executable(OpenQubeTests ${Tests})
-target_link_libraries(OpenQubeTests OpenQube)
+target_link_libraries(OpenQubeTests OpenQube AvogadroCore)
 
 foreach(test ${MyTests})
   message("Adding test ${test}...")
