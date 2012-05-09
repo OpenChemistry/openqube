@@ -69,7 +69,7 @@ public:
   /**
    * Set the molecule for the basis set.
    */
-  void setMolecule(const Molecule &molecule) { m_molecule = molecule; }
+  void setMolecule(const Molecule &molecule_) { m_molecule = molecule_; }
 
   /**
    * Get the molecule for the basis set.

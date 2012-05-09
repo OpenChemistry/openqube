@@ -30,10 +30,10 @@ bool Atom::isHydrogen() const
   return m_molecule ? m_molecule->atomAtomicNumber(m_index) == 1 : false;
 }
 
-void Atom::setAtomicNumber(short atomicNumber)
+void Atom::setAtomicNumber(short atomicNumber_)
 {
   if (m_molecule)
-    m_molecule->setAtomAtomicNumber(m_index, atomicNumber);
+    m_molecule->setAtomAtomicNumber(m_index, atomicNumber_);
 }
 
 Vector3d Atom::pos() const
@@ -41,10 +41,10 @@ Vector3d Atom::pos() const
   return m_molecule ? m_molecule->atomPos(m_index) : Vector3d::Zero();
 }
 
-void Atom::setPos(const Eigen::Vector3d& pos)
+void Atom::setPos(const Eigen::Vector3d& pos_)
 {
   if (m_molecule)
-    m_molecule->setAtomPos(m_index, pos);
+    m_molecule->setAtomPos(m_index, pos_);
 }
 
 } // End namespace

@@ -23,7 +23,7 @@ bool checkResult(const A& result, const B& expected)
   return true;
 }
 
-int testmolecule(int argc, char *argv[])
+int testmolecule(int , char *[])
 {
   bool error = false;
   cout << "Testing the molecule class..." << endl;
