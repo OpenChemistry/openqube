@@ -1,7 +1,9 @@
 find_package(Qt4 4.6 REQUIRED)
 find_package(Eigen3 REQUIRED)
+find_package(AvogadroLibs REQUIRED)
 
-include_directories(SYSTEM ${QT_INCLUDE_DIR} ${EIGEN3_INCLUDE_DIR})
+include_directories(SYSTEM ${QT_INCLUDE_DIR} ${EIGEN3_INCLUDE_DIR}
+  ${AvogadroLibs_INCLUDE_DIRS})
 
 # Headers for our public API
 set(openqube_HDRS
@@ -43,7 +45,7 @@ set_target_properties(OpenQube PROPERTIES
   SOVERSION 0
   LABELS openqube)
 
-target_link_libraries(OpenQube ${QT_QTCORE_LIBRARY})
+target_link_libraries(OpenQube ${QT_QTCORE_LIBRARY} AvogadroCore)
 
 # Install the library
 install(TARGETS OpenQube

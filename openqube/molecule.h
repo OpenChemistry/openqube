@@ -19,6 +19,7 @@
 
 #include "openqubeabi.h"
 
+#include <avogadro/core/molecule.h>
 #include "atom.h"
 
 #include <vector>
@@ -28,7 +29,7 @@ namespace OpenQube {
 
 class Atom;
 
-class OPENQUBE_EXPORT Molecule
+class OPENQUBE_EXPORT Molecule : public Avogadro::Core::Molecule
 {
 public:
   /** Default contructor to create an empty molecule object. */
@@ -82,7 +83,7 @@ public:
   /**
    * @return The total number of atoms in the molecule.
    */
-  size_t numAtoms() const { return m_atomicNumbers.size(); }
+  size_t numAtoms() const { return Avogadro::Core::Molecule::atomCount(); }
 
   /**
    * Convenience function: print out a summary of the molecule.
@@ -90,10 +91,6 @@ public:
   void print() const;
 
 protected:
-  /** Container of all atomic numbers for Atom objects in the molecule. */
-  std::vector<short> m_atomicNumbers;
-  /** Container of all atomic coordinates for the molecule. */
-  std::vector<std::vector<Eigen::Vector3d> > m_atomPositions;
   /** The current conformer, defaults to 0 in a standard molecule. */
   size_t m_conformer;
 };
