@@ -197,7 +197,7 @@ public:
    */
   double maxValue() const { return m_maxValue; }
 
-  void setName(const QString &name) { m_name = name; }
+  void setName(const QString &name_) { m_name = name_; }
   QString name() const { return m_name; }
 
   void setName(const char *name);
@@ -221,14 +221,14 @@ protected:
   QReadWriteLock *m_lock;
 };
 
-inline bool Cube::setValue(unsigned int i, double value)
+inline bool Cube::setValue(unsigned int i, double value_)
 {
   if (i < m_data.size()) {
-    m_data[i] = value;
-    if (value > m_maxValue)
-      m_maxValue = value;
-    if (value < m_minValue)
-      m_minValue = value;
+    m_data[i] = value_;
+    if (value_ > m_maxValue)
+      m_maxValue = value_;
+    if (value_ < m_minValue)
+      m_minValue = value_;
     return true;
   }
   else

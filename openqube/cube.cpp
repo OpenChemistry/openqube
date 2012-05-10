@@ -40,41 +40,41 @@ Cube::~Cube()
   m_lock = 0;
 }
 
-bool Cube::setLimits(const Vector3d &min, const Vector3d &max,
+bool Cube::setLimits(const Vector3d &min_, const Vector3d &max_,
                      const Vector3i &points)
 {
   // We can calculate all necessary properties and initialise our data
-  Vector3d delta = max - min;
+  Vector3d delta = max_ - min_;
   m_spacing = Vector3d(delta.x() / (points.x()-1),
                        delta.y() / (points.y()-1),
                        delta.z() / (points.z()-1));
-  m_min = min;
-  m_max = max;
+  m_min = min_;
+  m_max = max_;
   m_points = points;
   m_data.resize(m_points.x() * m_points.y() * m_points.z());
   return true;
 }
 
-bool Cube::setLimits(const Vector3d &min, const Vector3d &max,
-                     double spacing)
+bool Cube::setLimits(const Vector3d &min_, const Vector3d &max_,
+                     double spacing_)
 {
   Vector3i points;
-  Vector3d delta = max - min;
-  delta = delta / spacing;
+  Vector3d delta = max_ - min_;
+  delta = delta / spacing_;
   points = Vector3i(delta.x(), delta.y(), delta.z());
-  return setLimits(min, max, points);
+  return setLimits(min_, max_, points);
 }
 
-bool Cube::setLimits(const Vector3d &min, const Vector3i &dim,
-                     double spacing)
+bool Cube::setLimits(const Vector3d &min_, const Vector3i &dim,
+                     double spacing_)
 {
-  Vector3d max = Vector3d(min.x() + (dim.x()-1) * spacing,
-                          min.y() + (dim.y()-1) * spacing,
-                          min.z() + (dim.z()-1) * spacing);
-  m_min = min;
-  m_max = max;
+  Vector3d max_ = Vector3d(min_.x() + (dim.x()-1) * spacing_,
+                          min_.y() + (dim.y()-1) * spacing_,
+                          min_.z() + (dim.z()-1) * spacing_);
+  m_min = min_;
+  m_max = max_;
   m_points = dim;
-  m_spacing = Vector3d(spacing, spacing, spacing);
+  m_spacing = Vector3d(spacing_, spacing_, spacing_);
   m_data.resize(m_points.x() * m_points.y() * m_points.z());
   return true;
 }
@@ -89,30 +89,30 @@ bool Cube::setLimits(const Cube &cube)
   return true;
 }
 
-bool Cube::setLimits(const Molecule &mol, double spacing, double padding)
+bool Cube::setLimits(const Molecule &mol, double spacing_, double padding)
 {
   size_t numAtoms = mol.numAtoms();
-  Vector3d min, max;
+  Vector3d min_, max_;
   if (numAtoms) {
-    Vector3d curPos = min = max = mol.atomPos(0);
+    Vector3d curPos = min_ = max_ = mol.atomPos(0);
     for (size_t i = 1; i < numAtoms; ++i) {
       curPos = mol.atomPos(i);
-      if (curPos.x() < min.x()) min.x() = curPos.x();
-      if (curPos.x() > max.x()) max.x() = curPos.x();
-      if (curPos.y() < min.y()) min.y() = curPos.y();
-      if (curPos.y() > max.y()) max.y() = curPos.y();
-      if (curPos.z() < min.z()) min.z() = curPos.z();
-      if (curPos.z() > max.z()) max.z() = curPos.z();
+      if (curPos.x() < min_.x()) min_.x() = curPos.x();
+      if (curPos.x() > max_.x()) max_.x() = curPos.x();
+      if (curPos.y() < min_.y()) min_.y() = curPos.y();
+      if (curPos.y() > max_.y()) max_.y() = curPos.y();
+      if (curPos.z() < min_.z()) min_.z() = curPos.z();
+      if (curPos.z() > max_.z()) max_.z() = curPos.z();
     }
   } else {
-    min = max = Eigen::Vector3d::Zero();
+    min_ = max_ = Eigen::Vector3d::Zero();
   }
 
   // Now to take care of the padding term
-  min += Vector3d(-padding, -padding, -padding);
-  max += Vector3d(padding, padding, padding);
+  min_ += Vector3d(-padding, -padding, -padding);
+  max_ += Vector3d(padding, padding, padding);
 
-  return setLimits(min, max, spacing);
+  return setLimits(min_, max_, spacing_);
 }
 
 std::vector<double> * Cube::data()
@@ -280,20 +280,21 @@ double Cube::value(const Vector3d &pos) const
       value(hC.x(), hC.y(), hC.z()) * P.x()  * P.y()  * P.z();
 }
 
-bool Cube::setValue(int i, int j, int k, double value)
+bool Cube::setValue(int i, int j, int k, double value_)
 {
   unsigned int index = i*m_points.y()*m_points.z() + j*m_points.z() + k;
   if (index < m_data.size()) {
-    m_data[index] = value;
+    m_data[index] = value_;
     return true;
   }
-  else
+  else {
     return false;
+  }
 }
 
-void Cube::setName(const char *name)
+void Cube::setName(const char *name_)
 {
-  this->setName(QString(name));
+  this->setName(QString(name_));
 }
 
 const char * Cube::name_c_str() const

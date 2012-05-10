@@ -4,8 +4,19 @@ project(OpenQube)
 
 set(CMAKE_MODULE_PATH "${OpenQube_SOURCE_DIR}/cmake")
 
-include(CTest)
-enable_testing()
+include(BuildType)
+include(BuildLocation)
+include(CompilerFlags)
+include(InstallLocation)
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+
+option(ENABLE_TESTING "Enable testing and building the tests." OFF)
+
+if(ENABLE_TESTING)
+  include(CTest)
+  enable_testing()
+endif()
 
 # Set up our installation directories, version etc.
 set(OpenQube_VERSION_MAJOR   "0")
@@ -14,17 +25,19 @@ set(OpenQube_VERSION_PATCH   "0")
 set(OpenQube_VERSION
   "${OpenQube_VERSION_MAJOR}.${OpenQube_VERSION_MINOR}.${OpenQube_VERSION_PATCH}")
 
-set(INC_INSTALL_DIR          "include")
-set(LIB_INSTALL_DIR          "lib")
-set(BIN_INSTALL_DIR          "bin")
-
 # Use an exports file for Libraries targets
 set(OpenQube_EXPORTS_NAME OpenQubeExports)
 set(OpenQube_EXPORTS_FILE "${OpenQube_BINARY_DIR}/${Libraries_EXPORTS_NAME}.cmake")
 file(REMOVE "${Libraries_EXPORTS_FILE}")
 
-add_subdirectory(src)
+add_subdirectory(openqube)
 #add_subdirectory(tools)
+
+option(BUILD_DOCUMENTATION "Build project documentation" OFF)
+
+if(BUILD_DOCUMENTATION)
+  add_subdirectory(docs)
+endif()
 
 configure_file("${OpenQube_SOURCE_DIR}/cmake/OpenQubeConfig.cmake.in"
   "${OpenQube_BINARY_DIR}/OpenQubeConfig.cmake" @ONLY)
