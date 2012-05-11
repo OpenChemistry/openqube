@@ -25,6 +25,8 @@ set(OpenQube_VERSION_PATCH   "0")
 set(OpenQube_VERSION
   "${OpenQube_VERSION_MAJOR}.${OpenQube_VERSION_MINOR}.${OpenQube_VERSION_PATCH}")
 
+option(BUILD_SHARED_LIBS "Build with shared libraries" ON)
+
 # Use an exports file for Libraries targets
 set(OpenQube_EXPORTS_NAME OpenQubeExports)
 set(OpenQube_EXPORTS_FILE "${OpenQube_BINARY_DIR}/${Libraries_EXPORTS_NAME}.cmake")
@@ -42,9 +44,9 @@ endif()
 configure_file("${OpenQube_SOURCE_DIR}/cmake/OpenQubeConfig.cmake.in"
   "${OpenQube_BINARY_DIR}/OpenQubeConfig.cmake" @ONLY)
 install(FILES "${OpenQube_BINARY_DIR}/OpenQubeConfig.cmake"
-  DESTINATION "${LIB_INSTALL_DIR}/cmake/openqube")
+  DESTINATION "${INSTALL_LIBRARY_DIR}/cmake/openqube")
 
 configure_file("${OpenQube_SOURCE_DIR}/cmake/OpenQubeConfigVersion.cmake.in"
   "${OpenQube_BINARY_DIR}/OpenQubeConfigVersion.cmake" @ONLY)
 install(FILES "${OpenQube_BINARY_DIR}/OpenQubeConfigVersion.cmake"
-  DESTINATION "${LIB_INSTALL_DIR}/cmake/openqube")
+  DESTINATION "${INSTALL_LIBRARY_DIR}/cmake/openqube")
