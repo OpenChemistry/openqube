@@ -1,8 +1,8 @@
 
 #include <iostream>
 
-#include "molecule.h"
-#include "atom.h"
+#include <openqube/molecule.h>
+#include <openqube/atom.h>
 
 #include <Eigen/Geometry>
 
