@@ -66,6 +66,8 @@ void GAMESSUSOutput::processLine(GaussianSet *basis)
   if (m_in->atEnd())
     return;
 
+  QStringList list2;
+  QString     tmp;
   QStringList list = key.split(' ', QString::SkipEmptyParts);
   int numGTOs;
 
@@ -104,7 +106,29 @@ void GAMESSUSOutput::processLine(GaussianSet *basis)
     m_currentMode = NotParsing; // no longer reading GTOs
   } else if (key.contains("NUMBER OF ELECTRONS")) {
     m_electrons = list[4].toInt();
-  } else if (key.contains("EIGENVECTORS")) { //|| key.contains("MOLECULAR ORBITALS")) {
+  } else if (key.contains(" NUMBER OF OCCUPIED ORBITALS (ALPHA)")) {
+    m_occAlpha = list[6].toInt();
+  } else if (key.contains(" NUMBER OF OCCUPIED ORBITALS (BETA )")) {
+    m_occBeta = list[7].toInt();
+  } else if (key.contains("SCFTYP=")) {
+    //the SCFtyp is necessary to know what we are reading
+      list = key.split(' ');
+      tmp = list[0];
+      list2 = tmp.split('=');
+      tmp = list2[1];
+      if (tmp.contains("RHF"))
+        m_scftype=rhf;
+      else if (tmp.contains("UHF"))
+        m_scftype=uhf;
+      else if (tmp.contains("ROHF"))
+        m_scftype=rohf;
+      else {
+        qDebug() << "SCF type = " << tmp << " cannot be read.";
+        m_scftype=Unknown;
+        return;
+      }
+
+  } else if (key.contains("EIGENVECTORS") && m_scftype==rhf) { //|| key.contains("MOLECULAR ORBITALS")) {
     m_currentMode = MO;
     key = m_in->readLine(); // ----
     key = m_in->readLine(); // blank line
@@ -259,6 +283,20 @@ void GAMESSUSOutput::load(GaussianSet* basis)
 
 void GAMESSUSOutput::outputAll()
 {
+  switch(m_scftype)
+  {
+    case rhf:
+      qDebug() << "SCF type = RHF";
+      break;
+    case uhf:
+      qDebug() << "SCF type = UHF";
+      break;
+    case rohf:
+      qDebug() << "SCF type = ROHF";
+      break;
+    default:
+      qDebug() << "SCF typ = Unknown";
+  }
   qDebug() << "Shell mappings.";
   for (unsigned int i = 0; i < m_shellTypes.size(); ++i)
     qDebug() << i << ": type =" << m_shellTypes.at(i)
@@ -267,6 +305,7 @@ void GAMESSUSOutput::outputAll()
   qDebug() << "MO coefficients.";
   for (unsigned int i = 0; i < m_MOcoeffs.size(); ++i)
     qDebug() << m_MOcoeffs.at(i);
+
 }
 
 }

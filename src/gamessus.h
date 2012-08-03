@@ -30,7 +30,8 @@ namespace OpenQube
 class OPENQUBE_EXPORT GAMESSUSOutput
 {
   // Parsing mode: section of the file currently being parsed
-  enum mode { NotParsing, Atoms, GTO, MO};
+  enum mode { NotParsing, Atoms, GTO, MO };
+  enum scf  { rhf, uhf, rohf, Unknown };
 
 public:
   GAMESSUSOutput(const QString &filename, GaussianSet *basis);
@@ -45,7 +46,10 @@ private:
   double m_coordFactor;
   mode m_currentMode;
   int m_electrons;
+  int m_occAlpha;
+  int m_occBeta;
   int m_currentAtom;
+  scf m_scftype;
   unsigned int m_numBasisFunctions;
   std::vector<orbital> m_shellTypes;
   std::vector<int> m_shellNums;
