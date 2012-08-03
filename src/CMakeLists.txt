@@ -54,3 +54,4 @@ install(EXPORT OpenQubeTargets DESTINATION "${LIB_INSTALL_DIR}/cmake/openqube")
 install(FILES ${openqube_HDRS} DESTINATION "${INC_INSTALL_DIR}/openqube")
 
 add_subdirectory(testing)
+add_subdirectory(tools)
