@@ -153,6 +153,7 @@ bool GaussianSet::calculateCubeMO(Cube *cube, unsigned int state)
   if (state < 1 || state > static_cast<unsigned int>(m_moMatrix.rows()))
     return false;
 
+  outputAll();
   // Must be called before calculations begin
   initCalculation();
 
@@ -713,6 +714,7 @@ unsigned int GaussianSet::numMOs()
 void GaussianSet::outputAll()
 {
   // Can be called to print out a summary of the basis set as read in
+  m_numAtoms = m_molecule.numAtoms();
   qDebug() << "\nGaussian Basis Set\nNumber of atoms:" << m_numAtoms;
 
   initCalculation();
