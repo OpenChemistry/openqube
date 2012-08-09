@@ -88,6 +88,9 @@ void GAMESSUSOutput::processLine(GaussianSet *basis)
     m_currentMode = Atoms;
     key = m_in->readLine(); // skip column titles
     key = m_in->readLine(); // and ----- line
+  } else if (key.contains("INTERNUCLEAR DISTANCES",Qt::CaseInsensitive)) {
+    //this silly parser is far too greedy
+    m_currentMode = NotParsing;
   } else if (key.contains("ATOMIC BASIS SET")) {
     m_currentMode = GTO;
     // ---
@@ -147,7 +150,7 @@ void GAMESSUSOutput::processLine(GaussianSet *basis)
       Vector3d pos(list[2].toDouble() * m_coordFactor,
                    list[3].toDouble() * m_coordFactor,
                    list[4].toDouble() * m_coordFactor);
-      basis->moleculeRef().addAtom(pos, list[1].toInt());
+      basis->moleculeRef().addAtom(pos, int(list[1].toDouble()));
       break;
     }
     case GTO:
