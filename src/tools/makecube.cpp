@@ -35,7 +35,8 @@ static const double ANGSTROM_TO_BOHR = 1.0 / BOHR_TO_ANGSTROM;
 int main(int argc, char *argv[])
 {
 
-  QString filename="/Users/albert/Development/openqube/testfiles/rhf.gamess";
+  //The QM output file
+  QString filename = argv[1];
 
   BasisSet *m_basis;
   m_basis = OpenQube::BasisSetLoader::LoadBasisSet(filename);
@@ -47,7 +48,7 @@ int main(int argc, char *argv[])
   //Vector3d max = Vector3d( 5.166667, 5.166667, 5.166667);
   //water
   Vector3d min = Vector3d(-3.0,-3.0,-3.0);
-  Vector3d max = Vector3d( 3.1, 3.1, 3.1);
+  Vector3d max = Vector3d( 3.0, 3.0, 3.0);
   Vector3i points = Vector3i(61,61,61);
   
   //Vector3d min = Vector3d(-2.5,-2.5,-2.5);
