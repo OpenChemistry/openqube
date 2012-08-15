@@ -51,7 +51,7 @@ static const double BOHR_TO_ANGSTROM = 0.529177249;
 static const double ANGSTROM_TO_BOHR = 1.0 / BOHR_TO_ANGSTROM;
 
 GaussianSet::GaussianSet() : m_numMOs(0), m_numAtoms(0), m_init(false),
-  m_cube(0), m_gaussianShells(0)
+  m_cube(0), m_gaussianShells(0), m_numAlphaMOs(0), m_numBetaMOs(0)
 {
 }
 
@@ -132,6 +132,36 @@ void GaussianSet::addMOs(const vector<double>& MOs)
   for (unsigned int j = 0; j < columns; ++j)
     for (unsigned int i = 0; i < m_numMOs; ++i)
       m_moMatrix.coeffRef(i, j) = MOs[i + j*m_numMOs];
+}
+void GaussianSet::addAlphaMOs(const vector<double>& MOs)
+{
+  m_init = false;
+
+  // Some programs don't output all MOs, so we take the amount of data
+  // and divide by the # of AO functions
+  unsigned int columns = MOs.size() / m_numMOs;
+  qDebug() << " add Alpha MOs: " << m_numMOs << columns;
+
+  m_alphaMoMatrix.resize(m_numMOs, m_numMOs);
+
+  for (unsigned int j = 0; j < columns; ++j)
+    for (unsigned int i = 0; i < m_numMOs; ++i)
+      m_alphaMoMatrix.coeffRef(i, j) = MOs[i + j*m_numMOs];
+}
+void GaussianSet::addBetaMOs(const vector<double>& MOs)
+{
+  m_init = false;
+
+  // Some programs don't output all MOs, so we take the amount of data
+  // and divide by the # of AO functions
+  unsigned int columns = MOs.size() / m_numMOs;
+  qDebug() << " add Beta MOs: " << m_numMOs << columns;
+
+  m_betaMoMatrix.resize(m_numMOs, m_numMOs);
+
+  for (unsigned int j = 0; j < columns; ++j)
+    for (unsigned int i = 0; i < m_numMOs; ++i)
+      m_betaMoMatrix.coeffRef(i, j) = MOs[i + j*m_numMOs];
 }
 
 void GaussianSet::addMO(double)
@@ -379,6 +409,7 @@ void GaussianSet::processPoint(GaussianShell &shell)
 
   // Calculate our position
   Vector3d pos = shell.tCube->position(shell.pos) * ANGSTROM_TO_BOHR;
+  //qDebug() << pos.x() << " " << pos.y() << " " << pos.y();
 
   // Calculate the deltas for the position
   for (unsigned int i = 0; i < atomsSize; ++i) {
@@ -716,6 +747,22 @@ void GaussianSet::outputAll()
   // Can be called to print out a summary of the basis set as read in
   m_numAtoms = m_molecule.numAtoms();
   qDebug() << "\nGaussian Basis Set\nNumber of atoms:" << m_numAtoms;
+  switch(m_scfType)
+  {
+    case rhf:
+      qDebug() << "RHF orbitals";
+      break;
+    case uhf:
+      qDebug() << "UHF orbitals";
+      break;
+    case rohf:
+      qDebug() << "ROHF orbitals";
+      break;
+    default:
+      qDebug() << "Uknown orbitals";
+      break;
+  }
+
 
   initCalculation();
 

@@ -34,6 +34,10 @@ struct GaussianShell;
  * Enumeration of the Gaussian type orbitals.
  */
  enum orbital { S, SP, P, D, D5, F, F7, G, G9, H, H11, I, I13, UU };
+/**
+ * Enumeration of the SCF type.
+ */
+ enum scfType { rhf, uhf, rohf, Unknown };
 
 /**
  * @class GaussianSet gaussianset.h
@@ -98,6 +102,8 @@ public:
    * @param MOs Vector containing the MO coefficients for the GaussianSet.
    */
   void addMOs(const std::vector<double>& MOs);
+  void addAlphaMOs(const std::vector<double>& MOs);
+  void addBetaMOs(const std::vector<double>& MOs);
 
   /**
    * Add an individual MO coefficient.
@@ -119,6 +125,14 @@ public:
    * @return The number of MOs in the GaussianSet.
    */
   unsigned int numMOs();
+  /**
+   * @return The number of Alpha MOs in the GaussianSet.
+   */
+  unsigned int numAlphaMOs();
+  /**
+   * @return The number of Beta MOs in the GaussianSet.
+   */
+  unsigned int numBetaMOs();
 
   /**
    * Calculate the MO over the entire range of the supplied Cube.
@@ -151,6 +165,10 @@ public:
    */
   virtual BasisSet * clone();
 
+  //maybe there is another way this should work
+  //i'm not sure about these derived classes
+  scfType m_scfType;
+
 signals:
   /**
    * Emitted when the calculation is complete.
@@ -165,6 +183,7 @@ private slots:
 
 private:
   // New storage of the data
+  // basis set
   std::vector<int> m_symmetry;             //! Symmetry of the basis, S, P...
   std::vector<unsigned int> m_atomIndices; //! Indices into the atomPos vector
   std::vector<unsigned int> m_moIndices;   //! Indices into the MO/density matrix
@@ -173,16 +192,25 @@ private:
   std::vector<double> m_gtoA;              //! The GTO exponent
   std::vector<double> m_gtoC;              //! The GTO contraction coefficient
   std::vector<double> m_gtoCN;             //! The GTO contraction coefficient (normalized)
+  //MO sets (first two kept for legacy code)
   Eigen::MatrixXd m_moMatrix;              //! MO coefficient matrix
   Eigen::MatrixXd m_density;               //! Density matrix
+  Eigen::MatrixXd m_alphaMoMatrix;         //! up MO coefficient matrix
+  Eigen::MatrixXd m_betaMoMatrix;          //! down MO coefficient matrix
+  Eigen::MatrixXd m_alphaDensity;          //! up Density matrix
+  Eigen::MatrixXd m_betaDensity;           //! down Density matrix
 
-  unsigned int m_numMOs;    //! The number of GTOs
-  unsigned int m_numAtoms;  //! Total number of atoms in the basis set
-  bool m_init;              //! Has the calculation been initialised?
+
+  unsigned int m_numMOs;         //! The number of GTOs (not always!)
+  unsigned int m_numAlphaMOs;    //! The number of alpha orbitals
+  unsigned int m_numBetaMOs;     //! The number of beta orbitals
+  unsigned int m_numAtoms;       //! Total number of atoms in the basis set
+  bool m_init;                   //! Has the calculation been initialised?
 
   QFuture<void> m_future;
   QFutureWatcher<void> m_watcher;
-  Cube *m_cube; //! Cube to put the results into
+  Cube *m_cube;                  //! Cube to put the results into
+  //this is really the grid?
   QVector<GaussianShell> *m_gaussianShells;
 
   static bool isSmall(double val);

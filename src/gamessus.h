@@ -31,6 +31,7 @@ class OPENQUBE_EXPORT GAMESSUSOutput
 {
   // Parsing mode: section of the file currently being parsed
   enum mode { NotParsing, Atoms, GTO, MO };
+  enum scfMode { alpha, beta, doubly };
   enum scf  { rhf, uhf, rohf, Unknown };
 
 public:
@@ -45,9 +46,10 @@ private:
 
   double m_coordFactor;
   mode m_currentMode;
+  scfMode m_currentScfMode;
   int m_electrons;
-  int m_occAlpha;
-  int m_occBeta;
+  int m_electronsA;
+  int m_electronsB;
   int m_currentAtom;
   scf m_scftype;
   unsigned int m_numBasisFunctions;
@@ -58,7 +60,11 @@ private:
   std::vector<double> m_c;
   std::vector<double> m_csp;
   std::vector<double> m_orbitalEnergy;
+  std::vector<double> m_alphaOrbitalEnergy;
+  std::vector<double> m_betaOrbitalEnergy;
   std::vector<double> m_MOcoeffs;
+  std::vector<double> m_alphaMOcoeffs;
+  std::vector<double> m_betaMOcoeffs;
 };
 
 } // End namespace

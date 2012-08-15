@@ -31,7 +31,7 @@ namespace OpenQube
 {
 
 GAMESSUSOutput::GAMESSUSOutput(const QString &filename, GaussianSet* basis):
-  m_coordFactor(1.0), m_currentMode(NotParsing), m_currentAtom(1)
+  m_coordFactor(1.0), m_currentMode(NotParsing), m_currentAtom(1), m_currentScfMode(doubly)
 {
   // Open the file for reading and process it
   QFile* file = new QFile(filename);
@@ -110,9 +110,9 @@ void GAMESSUSOutput::processLine(GaussianSet *basis)
   } else if (key.contains("NUMBER OF ELECTRONS")) {
     m_electrons = list[4].toInt();
   } else if (key.contains(" NUMBER OF OCCUPIED ORBITALS (ALPHA)")) {
-    m_occAlpha = list[6].toInt();
+    m_electronsA = list[6].toInt();
   } else if (key.contains(" NUMBER OF OCCUPIED ORBITALS (BETA )")) {
-    m_occBeta = list[7].toInt();
+    m_electronsB = list[7].toInt();
   } else if (key.contains("SCFTYP=")) {
     //the SCFtyp is necessary to know what we are reading
       list = key.split(' ');
@@ -130,9 +130,25 @@ void GAMESSUSOutput::processLine(GaussianSet *basis)
         m_scftype=Unknown;
         return;
       }
-
-  } else if (key.contains("EIGENVECTORS") && m_scftype==rhf) { //|| key.contains("MOLECULAR ORBITALS")) {
+  } else if (key.contains("----- ALPHA SET -----") && m_scftype==uhf) {
     m_currentMode = MO;
+    m_currentScfMode = alpha;
+    key = m_in->readLine(); // blank line
+    key = m_in->readLine(); // ------------
+    key = m_in->readLine(); // EIGENVECTORS
+    key = m_in->readLine(); // ------------
+    key = m_in->readLine(); // blank line
+
+  } else if (key.contains("EIGENVECTORS") && m_currentScfMode==beta) { 
+    //beta is set at the conclustion of alpha reads
+    m_currentMode = MO;
+    key = m_in->readLine(); // ------------
+    key = m_in->readLine(); // blank line
+
+  } else if (key.contains("EIGENVECTORS") && m_scftype==rhf) { 
+    //|| key.contains("MOLECULAR ORBITALS")) {
+    m_currentMode = MO;
+    m_currentScfMode = doubly;
     key = m_in->readLine(); // ----
     key = m_in->readLine(); // blank line
   } else {
@@ -198,7 +214,20 @@ void GAMESSUSOutput::processLine(GaussianSet *basis)
       break;
 
     case MO:
-      m_MOcoeffs.clear(); // if the orbitals were punched multiple times
+      switch(m_currentScfMode)
+      {
+        case alpha:
+          m_alphaMOcoeffs.clear();
+          break;
+        case beta:
+          m_betaMOcoeffs.clear();
+          break;
+        case doubly:
+          m_MOcoeffs.clear(); // if the orbitals were punched multiple times
+          break;
+        default:
+          ;
+      }
       while(!key.contains("END OF") && !key.contains("-----")) {
         // currently reading the MO number
         key = m_in->readLine(); // energies
@@ -213,7 +242,7 @@ void GAMESSUSOutput::processLine(GaussianSet *basis)
           }
 
           key = m_in->readLine();
-          if (key.contains(QLatin1String("END OF RHF")))
+          if (key.contains(QLatin1String("END OF RHF")) || key.contains(QLatin1String("END OF UHF"))) 
             break;
           list = key.split(' ', QString::SkipEmptyParts);
         } // ok, we've finished one batch of MO coeffs
@@ -222,8 +251,21 @@ void GAMESSUSOutput::processLine(GaussianSet *basis)
         for (unsigned int i = 0; i < numColumns; ++i) {
           numRows = columns[i].size();
           for (unsigned int j = 0; j < numRows; ++j) {
-            qDebug() << "push back" << columns[i][j];
-            m_MOcoeffs.push_back(columns[i][j]);
+            //qDebug() << "push back" << columns[i][j];
+            switch(m_currentScfMode)
+            {
+              case alpha:
+                m_alphaMOcoeffs.push_back(columns[i][j]);
+                break;
+              case beta:
+                m_betaMOcoeffs.push_back(columns[i][j]);
+                break;
+              case doubly:
+                m_MOcoeffs.push_back(columns[i][j]);
+                break;
+              default:
+                ;
+            }
           }
         }
         columns.clear();
@@ -232,6 +274,8 @@ void GAMESSUSOutput::processLine(GaussianSet *basis)
           key = m_in->readLine(); // skip the blank line after the MOs
       } // finished parsing MOs
       m_currentMode = NotParsing;
+      if(m_currentScfMode == alpha)
+        m_currentScfMode = beta;
       break;
 
     default:
@@ -242,8 +286,13 @@ void GAMESSUSOutput::processLine(GaussianSet *basis)
 
 void GAMESSUSOutput::load(GaussianSet* basis)
 {
+
+  outputAll();
+
   // Now load up our basis set
   basis->setNumElectrons(m_electrons);
+  basis->setNumAlphaElectrons(m_electronsA);
+  basis->setNumBetaElectrons(m_electronsB);
 
   //    qDebug() << m_shellTypes.size() << m_shellNums.size() << m_shelltoAtom.size() << m_a.size() << m_c.size() << m_csp.size();
 
@@ -280,7 +329,29 @@ void GAMESSUSOutput::load(GaussianSet* basis)
   // Now to load in the MO coefficients
   if (m_MOcoeffs.size())
     basis->addMOs(m_MOcoeffs);
+  if (m_alphaMOcoeffs.size())
+    basis->addAlphaMOs(m_alphaMOcoeffs);
+  if (m_betaMOcoeffs.size())
+    basis->addBetaMOs(m_betaMOcoeffs);
 
+  switch(m_scftype)
+  {
+    case rhf:
+      basis->m_scfType = (OpenQube::scfType)0;
+      break;
+    case uhf:
+      basis->m_scfType = (OpenQube::scfType)1;
+      break;
+    case rohf:
+      basis->m_scfType = (OpenQube::scfType)2;
+      break;
+    case Unknown:
+      basis->m_scfType = (OpenQube::scfType)3;
+      break;
+    default:
+      basis->m_scfType = (OpenQube::scfType)3;
+      break;
+  }
   qDebug() << " done loadBasis ";
 }
 
@@ -305,9 +376,15 @@ void GAMESSUSOutput::outputAll()
     qDebug() << i << ": type =" << m_shellTypes.at(i)
              << ", number =" << m_shellNums.at(i)
              << ", atom =" << m_shelltoAtom.at(i);
-  qDebug() << "MO coefficients.";
+  if(m_MOcoeffs.size()) qDebug() << "MO coefficients.";
   for (unsigned int i = 0; i < m_MOcoeffs.size(); ++i)
     qDebug() << m_MOcoeffs.at(i);
+  if(m_alphaMOcoeffs.size()) qDebug() << "Alpha MO coefficients.";
+  for (unsigned int i = 0; i < m_alphaMOcoeffs.size(); ++i)
+    qDebug() << m_alphaMOcoeffs.at(i);
+  if(m_betaMOcoeffs.size()) qDebug() << "Beta MO coefficients.";
+  for (unsigned int i = 0; i < m_betaMOcoeffs.size(); ++i)
+    qDebug() << m_betaMOcoeffs.at(i);
 
 }
 

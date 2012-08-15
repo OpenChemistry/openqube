@@ -48,7 +48,7 @@ public:
   /**
    * Constructor.
    */
-  BasisSet() : m_electrons(0), m_valid(true) {}
+  BasisSet() : m_electrons(0),m_electronsA(0),m_electronsB(0),m_valid(true) {}
 
   /**
    * Destructor.
@@ -60,11 +60,29 @@ public:
    * @param n The number of electrons in the BasisSet.
    */
   void setNumElectrons(unsigned int n) { m_electrons = n; }
+  /**
+   * Set the number of electrons in the BasisSet.
+   * @param n The number of electrons in the BasisSet.
+   */
+  void setNumAlphaElectrons(unsigned int n) { m_electronsA = n; }
+  /**
+   * Set the number of electrons in the BasisSet.
+   * @param n The number of electrons in the BasisSet.
+   */
+  void setNumBetaElectrons(unsigned int n) { m_electronsB = n; }
 
   /**
    * @return The number of electrons in the molecule.
    */
   unsigned int numElectrons() { return m_electrons; }
+  /**
+   * @return The number of electrons in the molecule.
+   */
+  unsigned int numAlphaElectrons() { return m_electronsA; }
+  /**
+   * @return The number of electrons in the molecule.
+   */
+  unsigned int numBetaElectrons() { return m_electronsB; }
 
   /**
    * Set the molecule for the basis set.
@@ -86,6 +104,8 @@ public:
    * @return The number of MOs in the BasisSet.
    */
   virtual unsigned int numMOs() = 0;
+  //virtual unsigned int numAlphaMOs() = 0;
+  //virtual unsigned int numBetaMOs() = 0;
 
   /**
    * Check if the given MO number is the HOMO or not.
@@ -177,6 +197,8 @@ public:
 protected:
   /// Total number of electrons
   unsigned int m_electrons;
+  unsigned int m_electronsA;
+  unsigned int m_electronsB;
 
   /** Is the loaded basis set valid? Allows us to mark a basis set invalid if we
    * were not able to interpret part of it.
