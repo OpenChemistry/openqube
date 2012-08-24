@@ -1,0 +1,11 @@
+ $contrl coord=zmt $end
+ $scf dirscf=.t. $end
+ $basis gbasis=sto ngauss=3 $end
+ $data
+water
+c1
+O
+H 1 0.9572
+H 1 0.9572 2 104.5
+
+ $end

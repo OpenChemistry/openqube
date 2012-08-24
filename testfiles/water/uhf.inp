@@ -1,0 +1,11 @@
+ $contrl icharg=1 mult=2 scftyp=uhf coord=zmt $end
+ $scf dirscf=.t. $end
+ $basis gbasis=sto ngauss=3 $end
+ $data
+water
+c1
+O
+H 1 0.9572
+H 1 0.9572 2 105.4
+
+ $end

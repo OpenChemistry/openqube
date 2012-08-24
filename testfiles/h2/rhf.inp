@@ -1,0 +1,10 @@
+ $contrl coord=zmt $end
+ $scf dirscf=.t. $end
+ $basis gbasis=sto ngauss=3 $end
+ $data
+hydrogen
+c1
+H
+H 1 0.33
+
+ $end
