@@ -334,6 +334,10 @@ void GAMESSUSOutput::load(GaussianSet* basis)
   if (m_betaMOcoeffs.size())
     basis->addBetaMOs(m_betaMOcoeffs);
 
+  generateDensity();
+  if (m_density.rows())
+    basis->setDensityMatrix(m_density);
+
   switch(m_scftype)
   {
     case rhf:
@@ -387,5 +391,30 @@ void GAMESSUSOutput::outputAll()
     qDebug() << m_betaMOcoeffs.at(i);
 
 }
+
+void GAMESSUSOutput::generateDensity()
+{
+
+  m_numBasisFunctions=sqrt(m_MOcoeffs.size());
+  m_density.resize(m_numBasisFunctions, m_numBasisFunctions);
+  m_density=Eigen::MatrixXd::Zero(m_numBasisFunctions,m_numBasisFunctions);
+  for (unsigned int iBasis=0; iBasis < m_numBasisFunctions; iBasis++)
+  {
+    for (unsigned int jBasis=0;jBasis<=iBasis; jBasis++)
+    {
+      for (unsigned int iMO=0;iMO < m_electrons/2; iMO++)
+      {
+        double icoeff = m_MOcoeffs.at(iMO*m_numBasisFunctions+iBasis);
+        double jcoeff = m_MOcoeffs.at(iMO*m_numBasisFunctions+jBasis);
+        m_density(jBasis,iBasis) += 2.0*icoeff*jcoeff;
+        m_density(iBasis,jBasis) = m_density(jBasis,iBasis);
+
+      }
+      qDebug() << iBasis << ", " << jBasis << ": " << m_density(iBasis,jBasis);
+    }
+  }
+}
+
+
 
 }
