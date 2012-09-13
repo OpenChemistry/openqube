@@ -1,9 +1,9 @@
 ----- GAMESS execution script -----
 This job is running on host kolmakov.sam.pitt.edu
-under operating system Darwin at Wed Jul 25 14:42:43 EDT 2012
+under operating system Darwin at Mon Sep 10 15:01:32 EDT 2012
 Available scratch disk space (Kbyte units) at beginning of the job is
 Filesystem   1024-blocks      Used Available Capacity  Mounted on
-/dev/disk0s2   731734976 110129992 621348984    16%    /
+/dev/disk0s2   731734976 121236212 610242764    17%    /
 
  Distributed Data Interface kickoff program.
  Initiating 1 compute processes on 1 nodes to run the following command:
@@ -72,10 +72,10 @@ Filesystem   1024-blocks      Used Available Capacity  Mounted on
      N. COPERNICUS UNIVERSITY AND JACKSON STATE UNIVERSITY:
           MARIA BARYSZ
 
- EXECUTION OF GAMESS BEGUN Wed Jul 25 14:42:44 2012
+ EXECUTION OF GAMESS BEGUN Mon Sep 10 15:01:32 2012
 
             ECHO OF THE FIRST FEW INPUT CARDS -
- INPUT CARD> $contrl icharg=1 mult=2 scftyp=uhf coord=zmt $end                              
+ INPUT CARD> $contrl nprint=9 icharg=1 mult=2 scftyp=uhf coord=zmt $end                     
  INPUT CARD> $scf dirscf=.t. $end                                                           
  INPUT CARD> $basis gbasis=sto ngauss=3 $end                                                
  INPUT CARD> $data                                                                          
@@ -176,7 +176,7 @@ Filesystem   1024-blocks      Used Available Capacity  Mounted on
  PP    =NONE         RELWFN=NONE         LOCAL =NONE         NUMGRD=       F
  ISPHER=      -1     NOSYM =       0     MAXIT =      30     UNITS =ANGS    
  PLTORB=       F     MOLPLT=       F     AIMPAC=       F     FRIEND=        
- NPRINT=       7     IREST =       0     GEOM  =INPUT   
+ NPRINT=       9     IREST =       0     GEOM  =INPUT   
  NORMF =       0     NORMP =       0     ITOL  =      20     ICUT  =       9
  INTTYP=BEST         GRDTYP=BEST         QMTTOL= 1.0E-06
 
@@ -231,15 +231,15 @@ Filesystem   1024-blocks      Used Available Capacity  Mounted on
  A   =    7
 
  ..... DONE SETTING UP THE RUN .....
- STEP CPU TIME =     0.00 TOTAL CPU TIME =        0.0 (    0.0 MIN)
- TOTAL WALL CLOCK TIME=        0.0 SECONDS, CPU UTILIZATION IS 100.00%
+ STEP CPU TIME =     0.01 TOTAL CPU TIME =        0.0 (    0.0 MIN)
+ TOTAL WALL CLOCK TIME=        0.5 SECONDS, CPU UTILIZATION IS   1.96%
 
           ********************
           1 ELECTRON INTEGRALS
           ********************
  ...... END OF ONE-ELECTRON INTEGRALS ......
  STEP CPU TIME =     0.00 TOTAL CPU TIME =        0.0 (    0.0 MIN)
- TOTAL WALL CLOCK TIME=        0.0 SECONDS, CPU UTILIZATION IS 100.00%
+ TOTAL WALL CLOCK TIME=        0.5 SECONDS, CPU UTILIZATION IS   1.92%
 
           -------------
           GUESS OPTIONS
@@ -260,8 +260,8 @@ Filesystem   1024-blocks      Used Available Capacity  Mounted on
      4 ORBITALS ARE OCCUPIED (    1 CORE ORBITALS).
      2=A        3=A        4=A        5=A        6=A        7=A   
  ...... END OF INITIAL ORBITAL SELECTION ......
- STEP CPU TIME =     0.00 TOTAL CPU TIME =        0.0 (    0.0 MIN)
- TOTAL WALL CLOCK TIME=        0.0 SECONDS, CPU UTILIZATION IS 100.00%
+ STEP CPU TIME =     0.01 TOTAL CPU TIME =        0.0 (    0.0 MIN)
+ TOTAL WALL CLOCK TIME=        0.6 SECONDS, CPU UTILIZATION IS   3.45%
 
                     ----------------------
                     AO INTEGRAL TECHNOLOGY
@@ -284,7 +284,7 @@ Filesystem   1024-blocks      Used Available Capacity  Mounted on
  DIRECT TRANSFORMATION SKIPS AO INTEGRAL STORAGE ON DISK.
   ...... END OF TWO-ELECTRON INTEGRALS .....
  STEP CPU TIME =     0.02 TOTAL CPU TIME =        0.0 (    0.0 MIN)
- TOTAL WALL CLOCK TIME=        0.0 SECONDS, CPU UTILIZATION IS 100.00%
+ TOTAL WALL CLOCK TIME=        0.7 SECONDS, CPU UTILIZATION IS   6.06%
 
           ---------------------------
                   UHF SCF CALCULATION
@@ -357,10 +357,29 @@ Filesystem   1024-blocks      Used Available Capacity  Mounted on
     6  H  2  S   -0.834928  -0.892799
     7  H  3  S   -0.834928   0.892799
 
+          --------------
+          DENSITY MATRIX
+          --------------
+
+                      1          2          3          4          5
+
+    1  O  1  S    1.055437
+    2  O  1  S   -0.233127   1.013900
+    3  O  1  X    0.000000   0.000000   0.548155
+    4  O  1  Y    0.034234  -0.202520   0.000000   0.770299
+    5  O  1  Z    0.000000   0.000000   0.000000   0.000000   1.000000
+    6  H  2  S   -0.011610   0.001449   0.237441   0.174202   0.000000
+    7  H  3  S   -0.011610   0.001449  -0.237441   0.174202   0.000000
+
+                      6          7
+
+    6  H  2  S    0.144640
+    7  H  3  S   -0.061063   0.144640
+
   ----- BETA SET ----- 
 
           ------------
-B         EIGENVECTORS
+          EIGENVECTORS
           ------------
 
                       1          2          3          4          5
@@ -384,9 +403,28 @@ B         EIGENVECTORS
     5  O  1  Z    0.000000  -0.000000
     6  H  2  S   -0.826330  -0.876488
     7  H  3  S   -0.826330   0.876488
+
+          --------------
+          DENSITY MATRIX
+          --------------
+
+                      1          2          3          4          5
+
+    1  O  1  S    1.052780
+    2  O  1  S   -0.218889   0.943953
+    3  O  1  X    0.000000   0.000000   0.485469
+    4  O  1  Y    0.043634  -0.246933   0.000000   0.742636
+    5  O  1  Z    0.000000   0.000000   0.000000   0.000000   0.000000
+    6  H  2  S   -0.019086   0.026539   0.252866   0.186598   0.000000
+    7  H  3  S   -0.019086   0.026539  -0.252866   0.186598   0.000000
+
+                      6          7
+
+    6  H  2  S    0.187783
+    7  H  3  S   -0.075638   0.187783
  ...... END OF UHF CALCULATION ......
  STEP CPU TIME =     0.00 TOTAL CPU TIME =        0.0 (    0.0 MIN)
- TOTAL WALL CLOCK TIME=        0.0 SECONDS, CPU UTILIZATION IS  66.67%
+ TOTAL WALL CLOCK TIME=        0.7 SECONDS, CPU UTILIZATION IS   5.80%
 
      ----------------------------------------------------------------
      PROPERTY VALUES FOR THE UHF   SELF-CONSISTENT FIELD WAVEFUNCTION
@@ -429,9 +467,118 @@ B         EIGENVECTORS
              MIXED PART= 0.00000E+00 0.00000E+00 0.00000E+00 0.00000E+00
  ...... END OF PI ENERGY ANALYSIS ......
 
+          ----------------------------------------------------------
+          LOWDIN ORBITAL (VO(I,J)**2)*SIGN(VO(I,J))   ALPHA ORBITALS
+          ----------------------------------------------------------
+
+                      1          2          3          4          5
+
+                  -21.0326    -1.9272    -1.2021    -1.1146    -1.0667
+
+    1  O  1  S   -0.979737   0.017329   0.000000  -0.000000  -0.001436
+    2  O  1  S   -0.019927  -0.740496   0.000000  -0.000000   0.100100
+    3  O  1  X    0.000000  -0.000000  -0.687483  -0.000000  -0.000000
+    4  O  1  Y   -0.000005  -0.026182   0.000000  -0.000000  -0.819272
+    5  O  1  Z   -0.000000  -0.000000  -0.000000  -1.000000  -0.000000
+    6  H  2  S   -0.000166  -0.107996  -0.156259   0.000000  -0.039596
+    7  H  3  S   -0.000166  -0.107996   0.156259   0.000000  -0.039596
+
+                      6          7
+
+                    0.0852     0.2022
+
+    1  O  1  S   -0.001499   0.000000
+    2  O  1  S    0.139476  -0.000000
+    3  O  1  X    0.000000   0.312517
+    4  O  1  Y    0.154541  -0.000000
+    5  O  1  Z    0.000000   0.000000
+    6  H  2  S   -0.352242  -0.343741
+    7  H  3  S   -0.352242   0.343741
+
+          ------------------------
+          LOWDIN BOND ORDER MATRIX
+          ------------------------
+
+                      1          2          3          4          5
+
+    1  O  1  S    0.998501
+    2  O  1  S    0.000000   0.860524
+    3  O  1  X    0.000000   0.000000   0.687483
+    4  O  1  Y    0.000000   0.000000   0.000000   0.845459
+    5  O  1  Z    0.000000   0.000000   0.000000   0.000000   1.000000
+    6  H  2  S    0.000000   0.000000   0.000000   0.000000   0.000000
+    7  H  3  S    0.000000   0.000000   0.000000   0.000000   0.000000
+
+                      6          7
+
+    6  H  2  S    0.304017
+    7  H  3  S    0.000000   0.304017
+
+          ---------------------------------------------------------
+          LOWDIN ORBITAL (VO(I,J)**2)*SIGN(VO(I,J))   BETA ORBITALS
+          ---------------------------------------------------------
+
+                      1          2          3          4          5
+
+                  -21.0017    -1.7569    -1.1600    -1.0072    -0.2263
+
+    1  O  1  S   -0.980319   0.015800  -0.000000  -0.001942   0.000000
+    2  O  1  S   -0.019348  -0.679102   0.000000   0.131448   0.000000
+    3  O  1  X    0.000000  -0.000000   0.642467   0.000000   0.000000
+    4  O  1  Y   -0.000005  -0.033784   0.000000  -0.793794   0.000000
+    5  O  1  Z   -0.000000  -0.000000   0.000000  -0.000000   1.000000
+    6  H  2  S   -0.000164  -0.135657   0.178766  -0.036408  -0.000000
+    7  H  3  S   -0.000164  -0.135657  -0.178766  -0.036408  -0.000000
+
+                      6          7
+
+                    0.1175     0.2227
+
+    1  O  1  S   -0.001939  -0.000000
+    2  O  1  S    0.170101   0.000000
+    3  O  1  X    0.000000  -0.357533
+    4  O  1  Y    0.172418   0.000000
+    5  O  1  Z    0.000000  -0.000000
+    6  H  2  S   -0.327771   0.321234
+    7  H  3  S   -0.327771  -0.321234
+
+          ------------------------
+          LOWDIN BOND ORDER MATRIX
+          ------------------------
+
+                      1          2          3          4          5
+
+    1  O  1  S    0.998061
+    2  O  1  S    0.000000   0.829899
+    3  O  1  X    0.000000   0.000000   0.642467
+    4  O  1  Y    0.000000   0.000000   0.000000   0.827582
+    5  O  1  Z    0.000000   0.000000   0.000000   0.000000   0.000000
+    6  H  2  S    0.000000   0.000000   0.000000   0.000000   0.000000
+    7  H  3  S    0.000000   0.000000   0.000000   0.000000   0.000000
+
+                      6          7
+
+    6  H  2  S    0.350995
+    7  H  3  S    0.000000   0.350995
+
           ---------------------------------------
           MULLIKEN AND LOWDIN POPULATION ANALYSES
           ---------------------------------------
+
+     AO MULLIKEN POPULATIONS IN EACH MOLECULAR ORBITAL
+        ALPHA ORBITALS
+
+                      1          2          3          4          5
+
+                  1.000000   1.000000   1.000000   1.000000   1.000000
+
+    1             0.993843   0.004751   0.000000   0.000000   0.000408
+    2             0.006869   0.860440   0.000000   0.000000   0.092785
+    3             0.000000   0.000000   0.696784   0.000000   0.000000
+    4             0.000006   0.036441   0.000000   0.000000   0.816921
+    5             0.000000   0.000000   0.000000   1.000000   0.000000
+    6            -0.000359   0.049184   0.151608   0.000000   0.044943
+    7            -0.000359   0.049184   0.151608   0.000000   0.044943
 
      ATOMIC MULLIKEN POPULATION IN EACH MOLECULAR ORBITAL
         ALPHA ORBITALS
@@ -444,6 +591,21 @@ B         EIGENVECTORS
     2            -0.000359   0.049184   0.151608   0.000000   0.044943
     3            -0.000359   0.049184   0.151608   0.000000   0.044943
 
+     AO MULLIKEN POPULATIONS IN EACH MOLECULAR ORBITAL
+         BETA ORBITALS
+
+                      1          2          3          4
+
+                  1.000000   1.000000   1.000000   1.000000
+
+    1             0.994481   0.003919   0.000000   0.000508
+    2             0.006158   0.784466   0.000000   0.126719
+    3             0.000000   0.000000   0.643753   0.000000
+    4             0.000005   0.043810   0.000000   0.787800
+    5             0.000000   0.000000   0.000000   0.000000
+    6            -0.000322   0.083903   0.178123   0.042486
+    7            -0.000322   0.083903   0.178123   0.042486
+
      ATOMIC MULLIKEN POPULATION IN EACH MOLECULAR ORBITAL
          BETA ORBITALS
 
@@ -454,6 +616,42 @@ B         EIGENVECTORS
     1             1.000644   0.832195   0.643753   0.915027
     2            -0.000322   0.083903   0.178123   0.042486
     3            -0.000322   0.083903   0.178123   0.042486
+
+
+          ******* ALPHA ELECTRONS ********
+
+               ----- POPULATIONS IN EACH AO -----
+                             MULLIKEN      LOWDIN
+              1  O  1  S      0.99900     0.99850
+              2  O  1  S      0.96009     0.86052
+              3  O  1  X      0.69678     0.68748
+              4  O  1  Y      0.85337     0.84546
+              5  O  1  Z      1.00000     1.00000
+              6  H  2  S      0.24538     0.30402
+              7  H  3  S      0.24538     0.30402
+
+
+          ******** BETA ELECTRONS ********
+
+               ----- POPULATIONS IN EACH AO -----
+                             MULLIKEN      LOWDIN
+              1  O  1  S      0.99891     0.99806
+              2  O  1  S      0.91734     0.82990
+              3  O  1  X      0.64375     0.64247
+              4  O  1  Y      0.83162     0.82758
+              5  O  1  Z      0.00000     0.00000
+              6  H  2  S      0.30419     0.35100
+              7  H  3  S      0.30419     0.35100
+
+     ----- AO SPIN POPULATIONS -----
+                             MULLIKEN      LOWDIN
+              1  O  1  S      0.00009     0.00044
+              2  O  1  S      0.04275     0.03063
+              3  O  1  X      0.05303     0.04502
+              4  O  1  Y      0.02175     0.01788
+              5  O  1  Z      1.00000     1.00000
+              6  H  2  S     -0.05881    -0.04698
+              7  H  3  S     -0.05881    -0.04698
 
      ATOMIC SPIN POPULATION (ALPHA MINUS BETA)
        ATOM         MULL.POP.                    LOW.POP.
@@ -520,24 +718,27 @@ B         EIGENVECTORS
          DX          DY          DZ         /D/  (DEBYE)
     -0.000000    2.691933    0.000000    2.691933
  ...... END OF PROPERTY EVALUATION ......
- STEP CPU TIME =     0.00 TOTAL CPU TIME =        0.0 (    0.0 MIN)
- TOTAL WALL CLOCK TIME=        0.0 SECONDS, CPU UTILIZATION IS  66.67%
+ STEP CPU TIME =     0.01 TOTAL CPU TIME =        0.0 (    0.0 MIN)
+ TOTAL WALL CLOCK TIME=        0.7 SECONDS, CPU UTILIZATION IS   6.94%
                580000  WORDS OF DYNAMIC MEMORY USED
- EXECUTION OF GAMESS TERMINATED NORMALLY Wed Jul 25 14:42:44 2012
+ EXECUTION OF GAMESS TERMINATED NORMALLY Mon Sep 10 15:01:33 2012
  DDI: 263624 bytes (0.3 MB / 0 MWords) used by master data server.
 
  ----------------------------------------
  CPU timing information for all processes
  ========================================
- 0: 0.29 + 0.08 = 0.37
+ 0: 0.37 + 0.21 = 0.58
  ----------------------------------------
  ddikick.x: exited gracefully.
 ----- accounting info -----
 Files used on the master node kolmakov.sam.pitt.edu were:
--rw-r--r--  1 albert  staff      161 Jul 25 14:42 /Users/albert/Development/openqube/testfiles/uhf.F05
--rw-r--r--  1 albert  staff  1668720 Jul 25 14:42 /Users/albert/Development/openqube/testfiles/uhf.F10
--rw-r--r--  1 albert  staff     2630 Jul 25 14:42 /Users/albert/Development/openqube/testfiles/uhf.dat
--rw-r--r--  1 albert  staff    23942 Jul 25 14:42 /Users/albert/Development/openqube/testfiles/uhf.gamess
--rw-r--r--  1 albert  staff      161 Jul 25 14:42 /Users/albert/Development/openqube/testfiles/uhf.inp
-Wed Jul 25 14:42:47 EDT 2012
-0.112u 0.048s 0:03.17 4.7%	0+0k 0+1io 0pf+0w
+-rw-r--r--  1 albert  staff      170 Sep 10 15:01 /Users/albert/Development/openqube/testfiles/water/uhf.F05
+-rw-r--r--  1 albert  staff  1668720 Sep 10 15:01 /Users/albert/Development/openqube/testfiles/water/uhf.F10
+-rw-r--r--  1 albert  staff  2992054 Sep  7 15:08 /Users/albert/Development/openqube/testfiles/water/uhf.cube
+-rw-r--r--  1 albert  staff     2630 Sep 10 15:01 /Users/albert/Development/openqube/testfiles/water/uhf.dat
+-rw-r--r--  1 albert  staff  2992050 Sep 10 13:32 /Users/albert/Development/openqube/testfiles/water/uhf.dens.cube
+-rw-r--r--  1 albert  staff    31684 Sep 10 15:01 /Users/albert/Development/openqube/testfiles/water/uhf.gamess
+-rw-r--r--  1 albert  staff      170 Sep 10 15:01 /Users/albert/Development/openqube/testfiles/water/uhf.inp
+-rw-r--r--  1 albert  staff  2992050 Sep 10 13:33 /Users/albert/Development/openqube/testfiles/water/uhf.sdens.cube
+Mon Sep 10 15:01:36 EDT 2012
+0.125u 0.077s 0:04.14 4.5%	0+0k 6+11io 517pf+0w

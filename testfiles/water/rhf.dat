@@ -16,7 +16,7 @@ H           1.0     -0.7568480600      0.5204306404      0.0000000000
          1,   3,   1,
          2,   3,   1,   2,
  $END
---- CLOSED SHELL ORBITALS --- GENERATED AT Mon Aug  6 10:46:46 2012
+--- CLOSED SHELL ORBITALS --- GENERATED AT Thu Aug 30 15:18:04 2012
 water                                                                           
 E(RHF)=      -74.9629344753, E(NUC)=    9.1950127519,   11 ITERS
  $VEC   

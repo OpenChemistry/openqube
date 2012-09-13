@@ -1,4 +1,4 @@
- $contrl coord=zmt $end
+ $contrl coord=zmt nprint=9 $end
  $scf dirscf=.t. $end
  $basis gbasis=sto ngauss=3 $end
  $data

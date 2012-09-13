@@ -1,9 +1,9 @@
 ----- GAMESS execution script -----
-This job is running on host ph-wireless-pittnet-150-212-55-117.wireless.pitt.edu
-under operating system Darwin at Mon Aug 6 10:46:46 EDT 2012
+This job is running on host kolmakov.sam.pitt.edu
+under operating system Darwin at Thu Aug 30 15:18:03 EDT 2012
 Available scratch disk space (Kbyte units) at beginning of the job is
 Filesystem   1024-blocks      Used Available Capacity  Mounted on
-/dev/disk0s2   731734976 111373988 620104988    16%    /
+/dev/disk0s2   731734976 120153064 611325912    17%    /
 
  Distributed Data Interface kickoff program.
  Initiating 1 compute processes on 1 nodes to run the following command:
@@ -72,10 +72,10 @@ Filesystem   1024-blocks      Used Available Capacity  Mounted on
      N. COPERNICUS UNIVERSITY AND JACKSON STATE UNIVERSITY:
           MARIA BARYSZ
 
- EXECUTION OF GAMESS BEGUN Mon Aug  6 10:46:46 2012
+ EXECUTION OF GAMESS BEGUN Thu Aug 30 15:18:03 2012
 
             ECHO OF THE FIRST FEW INPUT CARDS -
- INPUT CARD> $contrl coord=zmt $end                                                         
+ INPUT CARD> $contrl coord=zmt nprint=9 $end                                                
  INPUT CARD> $scf dirscf=.t. $end                                                           
  INPUT CARD> $basis gbasis=sto ngauss=3 $end                                                
  INPUT CARD> $data                                                                          
@@ -176,7 +176,7 @@ Filesystem   1024-blocks      Used Available Capacity  Mounted on
  PP    =NONE         RELWFN=NONE         LOCAL =NONE         NUMGRD=       F
  ISPHER=      -1     NOSYM =       0     MAXIT =      30     UNITS =ANGS    
  PLTORB=       F     MOLPLT=       F     AIMPAC=       F     FRIEND=        
- NPRINT=       7     IREST =       0     GEOM  =INPUT   
+ NPRINT=       9     IREST =       0     GEOM  =INPUT   
  NORMF =       0     NORMP =       0     ITOL  =      20     ICUT  =       9
  INTTYP=BEST         GRDTYP=BEST         QMTTOL= 1.0E-06
 
@@ -231,15 +231,15 @@ Filesystem   1024-blocks      Used Available Capacity  Mounted on
  A   =    7
 
  ..... DONE SETTING UP THE RUN .....
- STEP CPU TIME =     0.00 TOTAL CPU TIME =        0.0 (    0.0 MIN)
- TOTAL WALL CLOCK TIME=        0.0 SECONDS, CPU UTILIZATION IS   0.00%
+ STEP CPU TIME =     0.01 TOTAL CPU TIME =        0.0 (    0.0 MIN)
+ TOTAL WALL CLOCK TIME=        0.5 SECONDS, CPU UTILIZATION IS   2.04%
 
           ********************
           1 ELECTRON INTEGRALS
           ********************
  ...... END OF ONE-ELECTRON INTEGRALS ......
- STEP CPU TIME =     0.00 TOTAL CPU TIME =        0.0 (    0.0 MIN)
- TOTAL WALL CLOCK TIME=        0.0 SECONDS, CPU UTILIZATION IS   0.00%
+ STEP CPU TIME =     0.01 TOTAL CPU TIME =        0.0 (    0.0 MIN)
+ TOTAL WALL CLOCK TIME=        0.5 SECONDS, CPU UTILIZATION IS   4.00%
 
           -------------
           GUESS OPTIONS
@@ -257,7 +257,7 @@ Filesystem   1024-blocks      Used Available Capacity  Mounted on
      2=A        3=A        4=A        5=A        6=A        7=A   
  ...... END OF INITIAL ORBITAL SELECTION ......
  STEP CPU TIME =     0.00 TOTAL CPU TIME =        0.0 (    0.0 MIN)
- TOTAL WALL CLOCK TIME=        0.0 SECONDS, CPU UTILIZATION IS   0.00%
+ TOTAL WALL CLOCK TIME=        0.6 SECONDS, CPU UTILIZATION IS   3.51%
 
                     ----------------------
                     AO INTEGRAL TECHNOLOGY
@@ -280,7 +280,7 @@ Filesystem   1024-blocks      Used Available Capacity  Mounted on
  DIRECT TRANSFORMATION SKIPS AO INTEGRAL STORAGE ON DISK.
   ...... END OF TWO-ELECTRON INTEGRALS .....
  STEP CPU TIME =     0.02 TOTAL CPU TIME =        0.0 (    0.0 MIN)
- TOTAL WALL CLOCK TIME=        0.0 SECONDS, CPU UTILIZATION IS  40.00%
+ TOTAL WALL CLOCK TIME=        0.7 SECONDS, CPU UTILIZATION IS   6.15%
 
           --------------------------
                  RHF SCF CALCULATION
@@ -343,9 +343,28 @@ Filesystem   1024-blocks      Used Available Capacity  Mounted on
     5  O  1  Z    0.000000   0.000000
     6  H  2  S   -0.797141  -0.838714
     7  H  3  S   -0.797141   0.838714
+
+          --------------
+          DENSITY MATRIX
+          --------------
+
+                      1          2          3          4          5
+
+    1  O  1  S    2.106260
+    2  O  1  S   -0.446041   1.967383
+    3  O  1  X    0.000000   0.000000   0.735617
+    4  O  1  Y    0.108585  -0.617730   0.000000   1.240110
+    5  O  1  Z    0.000000   0.000000   0.000000   0.000000   2.000000
+    6  H  2  S   -0.028426  -0.034106   0.539776   0.472696   0.000000
+    7  H  3  S   -0.028426  -0.034106  -0.539776   0.472696   0.000000
+
+                      6          7
+
+    6  H  2  S    0.600928
+    7  H  3  S   -0.191218   0.600928
  ...... END OF RHF CALCULATION ......
- STEP CPU TIME =     0.00 TOTAL CPU TIME =        0.0 (    0.0 MIN)
- TOTAL WALL CLOCK TIME=        0.1 SECONDS, CPU UTILIZATION IS  33.33%
+ STEP CPU TIME =     0.01 TOTAL CPU TIME =        0.0 (    0.0 MIN)
+ TOTAL WALL CLOCK TIME=        0.7 SECONDS, CPU UTILIZATION IS   7.04%
 
      ----------------------------------------------------------------
      PROPERTY VALUES FOR THE RHF   SELF-CONSISTENT FIELD WAVEFUNCTION
@@ -388,9 +407,70 @@ Filesystem   1024-blocks      Used Available Capacity  Mounted on
              MIXED PART= 0.00000E+00 0.00000E+00 0.00000E+00 0.00000E+00
  ...... END OF PI ENERGY ANALYSIS ......
 
+          -----------------------------------------
+          LOWDIN ORBITAL (VO(I,J)**2)*SIGN(VO(I,J))
+          -----------------------------------------
+
+                      1          2          3          4          5
+
+                  -20.2418    -1.2684    -0.6179    -0.4530    -0.3913
+
+    1  O  1  S   -0.979794   0.016176  -0.000000  -0.002037   0.000000
+    2  O  1  S   -0.019870  -0.674775  -0.000000   0.143115   0.000000
+    3  O  1  X    0.000000  -0.000000   0.550480  -0.000000  -0.000000
+    4  O  1  Y   -0.000006  -0.019803  -0.000000  -0.720623   0.000000
+    5  O  1  Z   -0.000000  -0.000000  -0.000000   0.000000   1.000000
+    6  H  2  S   -0.000165  -0.144623   0.224760  -0.067112  -0.000000
+    7  H  3  S   -0.000165  -0.144623  -0.224760  -0.067112   0.000000
+
+                      6          7
+
+                    0.6057     0.7423
+
+    1  O  1  S   -0.001993  -0.000000
+    2  O  1  S    0.162240  -0.000000
+    3  O  1  X    0.000000   0.449520
+    4  O  1  Y    0.259568  -0.000000
+    5  O  1  Z    0.000000   0.000000
+    6  H  2  S   -0.288100  -0.275240
+    7  H  3  S   -0.288100   0.275240
+
+          ------------------------
+          LOWDIN BOND ORDER MATRIX
+          ------------------------
+
+                      1          2          3          4          5
+
+    1  O  1  S    1.996014
+    2  O  1  S    0.000000   1.675521
+    3  O  1  X    0.000000   0.000000   1.100961
+    4  O  1  Y    0.000000   0.000000   0.000000   1.480864
+    5  O  1  Z    0.000000   0.000000   0.000000   0.000000   2.000000
+    6  H  2  S    0.000000   0.000000   0.000000   0.000000   0.000000
+    7  H  3  S    0.000000   0.000000   0.000000   0.000000   0.000000
+
+                      6          7
+
+    6  H  2  S    0.873320
+    7  H  3  S    0.000000   0.873320
+
           ---------------------------------------
           MULLIKEN AND LOWDIN POPULATION ANALYSES
           ---------------------------------------
+
+     AO MULLIKEN POPULATIONS IN EACH MOLECULAR ORBITAL
+
+                      1          2          3          4          5
+
+                  2.000000   2.000000   2.000000   2.000000   2.000000
+
+    1             1.987806   0.008548   0.000000   0.001257   0.000000
+    2             0.013611   1.548796   0.000000   0.267009   0.000000
+    3             0.000000   0.000000   1.071463   0.000000   0.000000
+    4             0.000013   0.053426   0.000000   1.414395   0.000000
+    5             0.000000   0.000000   0.000000   0.000000   2.000000
+    6            -0.000715   0.194615   0.464268   0.158669   0.000000
+    7            -0.000715   0.194615   0.464268   0.158669   0.000000
 
      ATOMIC MULLIKEN POPULATION IN EACH MOLECULAR ORBITAL
 
@@ -450,24 +530,25 @@ Filesystem   1024-blocks      Used Available Capacity  Mounted on
          DX          DY          DZ         /D/  (DEBYE)
      0.000000    1.725941    0.000000    1.725941
  ...... END OF PROPERTY EVALUATION ......
- STEP CPU TIME =     0.01 TOTAL CPU TIME =        0.0 (    0.0 MIN)
- TOTAL WALL CLOCK TIME=        0.1 SECONDS, CPU UTILIZATION IS  50.00%
+ STEP CPU TIME =     0.00 TOTAL CPU TIME =        0.0 (    0.0 MIN)
+ TOTAL WALL CLOCK TIME=        0.7 SECONDS, CPU UTILIZATION IS   6.85%
                580000  WORDS OF DYNAMIC MEMORY USED
- EXECUTION OF GAMESS TERMINATED NORMALLY Mon Aug  6 10:46:46 2012
+ EXECUTION OF GAMESS TERMINATED NORMALLY Thu Aug 30 15:18:04 2012
  DDI: 263624 bytes (0.3 MB / 0 MWords) used by master data server.
 
  ----------------------------------------
  CPU timing information for all processes
  ========================================
- 0: 0.30 + 0.08 = 0.39
+ 0: 0.39 + 0.22 = 0.61
  ----------------------------------------
  ddikick.x: exited gracefully.
 ----- accounting info -----
-Files used on the master node ph-wireless-pittnet-150-212-55-117.wireless.pitt.edu were:
--rw-r--r--  1 albert  staff      134 Aug  6 10:46 /Users/albert/Development/openqube/testfiles/rhf.F05
--rw-r--r--  1 albert  staff  1276080 Aug  6 10:46 /Users/albert/Development/openqube/testfiles/rhf.F10
--rw-r--r--  1 albert  staff     1813 Aug  6 10:46 /Users/albert/Development/openqube/testfiles/rhf.dat
--rw-r--r--  1 albert  staff    21201 Aug  6 10:46 /Users/albert/Development/openqube/testfiles/rhf.gamess
--rw-r--r--  1 albert  staff      134 Aug  6 10:46 /Users/albert/Development/openqube/testfiles/rhf.inp
-Mon Aug  6 10:46:49 EDT 2012
-0.114u 0.049s 0:03.20 4.6%	0+0k 0+11io 21pf+0w
+Files used on the master node kolmakov.sam.pitt.edu were:
+-rw-r--r--  1 albert  staff      143 Aug 30 15:18 /Users/albert/Development/openqube/testfiles/water/rhf.F05
+-rw-r--r--  1 albert  staff  1276080 Aug 30 15:18 /Users/albert/Development/openqube/testfiles/water/rhf.F10
+-rw-r--r--  1 albert  staff  2992054 Aug 28 12:57 /Users/albert/Development/openqube/testfiles/water/rhf.cube
+-rw-r--r--  1 albert  staff     1813 Aug 30 15:18 /Users/albert/Development/openqube/testfiles/water/rhf.dat
+-rw-r--r--  1 albert  staff    24273 Aug 30 15:18 /Users/albert/Development/openqube/testfiles/water/rhf.gamess
+-rw-r--r--  1 albert  staff      143 Aug 30 15:17 /Users/albert/Development/openqube/testfiles/water/rhf.inp
+Thu Aug 30 15:18:07 EDT 2012
+0.131u 0.091s 0:04.19 5.2%	0+0k 16+16io 507pf+0w
