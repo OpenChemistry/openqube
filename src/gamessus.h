@@ -65,6 +65,9 @@ private:
   std::vector<double> m_MOcoeffs;
   std::vector<double> m_alphaMOcoeffs;
   std::vector<double> m_betaMOcoeffs;
+
+  Eigen::MatrixXd m_density;     /// Total density matrix
+  void generateDensity();
 };
 
 } // End namespace

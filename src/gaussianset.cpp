@@ -169,6 +169,13 @@ void GaussianSet::addMO(double)
   m_init = false;
 }
 
+bool GaussianSet::setDensityMatrix()
+{
+  //For some methods the density matrix is easily computed
+  //RHF = sum_i^Nocc OccOrb_i*OccOrb_i, where Nocc is numElectrons/2
+  return true;
+}
+
 bool GaussianSet::setDensityMatrix(const Eigen::MatrixXd &m)
 {
   m_density.resize(m.rows(), m.cols());
@@ -214,8 +221,11 @@ bool GaussianSet::calculateCubeMO(Cube *cube, unsigned int state)
 bool GaussianSet::calculateCubeDensity(Cube *cube)
 {
   if (m_density.size() == 0) {
-    qDebug() << "Cannot calculate density -- density matrix not set.";
-    return false;
+    bool dens=generateDensity();
+    if(!dens) {
+      qDebug() << "Cannot calculate density -- density matrix not set.";
+      return false;
+    }
   }
 
   // FIXME Still not working, committed so others could see current state.
@@ -740,6 +750,62 @@ unsigned int GaussianSet::numMOs()
 {
   // Return the total number of MOs
   return m_moMatrix.rows();
+}
+unsigned int GaussianSet::numAlphaMOs()
+{
+  // Return the total number of MOs
+  return m_alphaMoMatrix.rows();
+}
+unsigned int GaussianSet::numBetaMOs()
+{
+  // Return the total number of MOs
+  return m_betaMoMatrix.rows();
+}
+
+bool GaussianSet::generateDensity()
+{
+
+  if(m_scfType == Unknown)
+    return false;
+
+  m_density.resize(m_numMOs, m_numMOs);
+  m_density=Eigen::MatrixXd::Zero(m_numMOs,m_numMOs);
+  for (unsigned int iBasis=0; iBasis < m_numMOs; iBasis++)
+  {
+    for (unsigned int jBasis=0;jBasis<=iBasis; jBasis++)
+    {
+      switch(m_scfType)
+      {
+        case rhf:
+          for (unsigned int iMO=0;iMO < m_electrons/2; iMO++)
+          {
+            double icoeff = m_moMatrix(iBasis,iMO);
+            double jcoeff = m_moMatrix(jBasis,iMO);
+            m_density(jBasis,iBasis) += 2.0*icoeff*jcoeff;
+            m_density(iBasis,jBasis) = m_density(jBasis,iBasis);
+          }
+          //qDebug() << iBasis << ", " << jBasis << ": " << m_density(iBasis,jBasis);
+          break;
+        case uhf:
+          for (unsigned int iaMO=0;iaMO < m_electronsA; iaMO++)
+          {
+            double icoeff = m_alphaMoMatrix(iBasis,iaMO);
+            double jcoeff = m_alphaMoMatrix(jBasis,iaMO);
+            m_density(jBasis,iBasis) += icoeff*jcoeff;
+            m_density(iBasis,jBasis) = m_density(jBasis,iBasis);
+          }
+          for (unsigned int ibMO=0;ibMO < m_electronsB; ibMO++)
+          {
+            double icoeff = m_betaMoMatrix(iBasis,ibMO);
+            double jcoeff = m_betaMoMatrix(jBasis,ibMO);
+            m_density(jBasis,iBasis) += icoeff*jcoeff;
+            m_density(iBasis,jBasis) = m_density(jBasis,iBasis);
+          }
+          break;
+      }
+    }
+  }
+  return true;
 }
 
 void GaussianSet::outputAll()

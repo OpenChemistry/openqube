@@ -116,10 +116,14 @@ public:
    */
   bool setDensityMatrix(const Eigen::MatrixXd &m);
 
+  //this one builds the density matrix, provided certain information is known
+  bool setDensityMatrix();
+
   /**
    * Debug routine, outputs all of the data in the GaussianSet.
    */
   void outputAll();
+  void outputAlphaAll();
 
   /**
    * @return The number of MOs in the GaussianSet.
@@ -207,6 +211,10 @@ private:
   unsigned int m_numAtoms;       //! Total number of atoms in the basis set
   bool m_init;                   //! Has the calculation been initialised?
 
+  unsigned int m_numElectrons;
+  unsigned int m_numAlphaElectrons;
+  unsigned int m_numBetaElectrons;
+
   QFuture<void> m_future;
   QFutureWatcher<void> m_watcher;
   Cube *m_cube;                  //! Cube to put the results into
@@ -239,6 +247,7 @@ private:
                      double dr2, int basis, Eigen::MatrixXd &out);
   static void pointD5(GaussianSet *set, const Eigen::Vector3d &delta,
                       double dr2, int basis, Eigen::MatrixXd &out);
+  bool generateDensity();
 };
 
 } // End namespace

@@ -104,8 +104,6 @@ public:
    * @return The number of MOs in the BasisSet.
    */
   virtual unsigned int numMOs() = 0;
-  //virtual unsigned int numAlphaMOs() = 0;
-  //virtual unsigned int numBetaMOs() = 0;
 
   /**
    * Check if the given MO number is the HOMO or not.

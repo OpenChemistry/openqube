@@ -109,9 +109,9 @@ void GAMESSUSOutput::processLine(GaussianSet *basis)
     m_currentMode = NotParsing; // no longer reading GTOs
   } else if (key.contains("NUMBER OF ELECTRONS")) {
     m_electrons = list[4].toInt();
-  } else if (key.contains(" NUMBER OF OCCUPIED ORBITALS (ALPHA)")) {
+  } else if (key.contains("NUMBER OF OCCUPIED ORBITALS (ALPHA)")) {
     m_electronsA = list[6].toInt();
-  } else if (key.contains(" NUMBER OF OCCUPIED ORBITALS (BETA )")) {
+  } else if (key.contains("NUMBER OF OCCUPIED ORBITALS (BETA )")) {
     m_electronsB = list[7].toInt();
   } else if (key.contains("SCFTYP=")) {
     //the SCFtyp is necessary to know what we are reading
@@ -334,9 +334,9 @@ void GAMESSUSOutput::load(GaussianSet* basis)
   if (m_betaMOcoeffs.size())
     basis->addBetaMOs(m_betaMOcoeffs);
 
-  generateDensity();
-  if (m_density.rows())
-    basis->setDensityMatrix(m_density);
+  //generateDensity();
+  //if (m_density.rows())
+    //basis->setDensityMatrix(m_density);
 
   switch(m_scftype)
   {
