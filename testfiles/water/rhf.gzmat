@@ -1,0 +1,10 @@
+%chk=rhf.chk
+# rhf/sto-3g
+
+water
+
+0 1
+O
+H 1 0.9572
+H 1 0.9572 2 104.5
+
