@@ -7,7 +7,7 @@ message(STATUS "QT: ${QT_LIBRARIES}")
 include_directories(..)
 
 
-add_executable(makecube makecube.cpp)
-target_link_libraries(makecube OpenQube ${QT_LIBRARIES})
+add_executable(qube qube.cpp)
+target_link_libraries(qube OpenQube ${QT_LIBRARIES})
 
 

@@ -1,6 +1,7 @@
 
 #include <iostream>
 #include <stdio.h>
+#include <string.h>
 
 #include "molecule.h"
 #include "atom.h"
@@ -35,8 +36,42 @@ static const double ANGSTROM_TO_BOHR = 1.0 / BOHR_TO_ANGSTROM;
 int main(int argc, char *argv[])
 {
 
+
+  if ( argc < 3 )
+  {
+    cerr << "Usage: " << argv[0] << " qm-output.file density" << endl;
+    cerr << "Usage: " << argv[0] << " qm-output.file orbital <number>" << endl;
+    return 1;
+  }
+
   //The QM output file
   QString filename = argv[1];
+
+  int calcType;
+  int orbID;
+  if (argv[2] == std::string("density"))
+  {
+    calcType = 0;
+  }
+  else if (argv[2] == std::string("spindensity"))
+  {
+    calcType = 1;
+  }
+  else if (argv[2] == std::string("orbital"))
+  {
+    if(argc < 4)
+    {
+      cerr << "Please specify the orbital number" << endl;
+      return 1;
+    }
+    calcType = 2;
+    orbID = atoi(argv[3]);
+  }
+  else
+  {
+    cerr << argv[2] << " is an unkown cube content" << endl;
+    return 1;
+  }
 
   BasisSet *m_basis;
   m_basis = OpenQube::BasisSetLoader::LoadBasisSet(filename);
@@ -48,15 +83,30 @@ int main(int argc, char *argv[])
   Vector3d min = Vector3d(-3.0,-3.0,-3.0);
   Vector3d max = Vector3d( 3.0, 3.0, 3.0);
   Vector3i points = Vector3i(61,61,61);
-  
+
 
   //Angstrom!!!!
   m_qube->setLimits(min*BOHR_TO_ANGSTROM,max*BOHR_TO_ANGSTROM,points);
 
   //Chose what to plot
-  //m_basis->blockingCalculateCubeMO(m_qube,5);
-  m_basis->blockingCalculateCubeDensity(m_qube);
-  
+  switch(calcType)
+  {
+    case 0:
+      m_basis->blockingCalculateCubeDensity(m_qube);
+      break;
+    case 1:
+      //m_basis->blockingCalculateCubeSpingDensity(m_qube);
+      break;
+    case 2:
+      m_basis->blockingCalculateCubeMO(m_qube,orbID);
+      break;
+    default:
+      cerr << "calcType set to " << calcType << ".  Why?" << endl;
+      return 1;
+      break;
+  }
+
+
   //cube header
   printf("OpenQube\ncubefile\n");
   int nat=m_basis->moleculeRef().numAtoms();
@@ -67,7 +117,7 @@ int main(int argc, char *argv[])
   printf("%4d %11.6f %11.6f %11.6f\n",points.x(),spacing.x(),0.0,0.0);
   printf("%4d %11.6f %11.6f %11.6f\n",points.y(),0.0,spacing.y(),.0);
   printf("%4d %11.6f %11.6f %11.6f\n",points.z(),0.0,0.0,spacing.z());
-  
+
 
   //atoms
   for (int iatom=0;iatom<m_basis->moleculeRef().numAtoms();iatom++)
@@ -98,7 +148,7 @@ int main(int argc, char *argv[])
       printf(" ");
   }
   printf("\n");
-  
+
 
   return 0;
 }
