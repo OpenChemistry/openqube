@@ -39,6 +39,8 @@ struct GaussianShell;
  */
  enum scfType { rhf, uhf, rohf, Unknown };
 
+ enum orbType { Alpha, Beta, Doubly };
+
 /**
  * @class GaussianSet gaussianset.h
  * @brief GaussianSet Class
@@ -124,6 +126,7 @@ public:
    */
   void outputAll();
   void outputAlphaAll();
+  void outputBetaAll();
 
   /**
    * @return The number of MOs in the GaussianSet.
@@ -147,6 +150,8 @@ public:
    * @return True if the calculation was successful.
    */
   bool calculateCubeMO(Cube *cube, unsigned int state = 1);
+  bool calculateCubeAlphaMO(Cube *cube, unsigned int state = 1);
+  bool calculateCubeBetaMO(Cube *cube, unsigned int state = 1);
 
   /**
    * Calculate the electron density over the entire range of the supplied Cube.
@@ -157,6 +162,16 @@ public:
    * @return True if the calculation was successful.
    */
   bool calculateCubeDensity(Cube *cube);
+
+  /**
+   * Calculate the electron spin density over the entire range of the supplied Cube.
+   * @param cube The cube to write the values of the MO into.
+   * @note This function starts a threaded calculation. Use watcher()
+   * to monitor progress.
+   * @sa blockingCalculateCubeSpinDensity
+   * @return True if the calculation was successful.
+   */
+  bool calculateCubeSpinDensity(Cube *cube);
 
   /**
    * When performing a calculation the QFutureWatcher is useful if you want
@@ -199,6 +214,7 @@ private:
   //MO sets (first two kept for legacy code)
   Eigen::MatrixXd m_moMatrix;              //! MO coefficient matrix
   Eigen::MatrixXd m_density;               //! Density matrix
+  Eigen::MatrixXd m_spinDensity;           //! Spin Density matrix
   Eigen::MatrixXd m_alphaMoMatrix;         //! up MO coefficient matrix
   Eigen::MatrixXd m_betaMoMatrix;          //! down MO coefficient matrix
   Eigen::MatrixXd m_alphaDensity;          //! up Density matrix
@@ -226,18 +242,21 @@ private:
   void initCalculation();  //! Perform initialisation before any calculations
   /// Re-entrant single point forms of the calculations
   static void processPoint(GaussianShell &shell);
+  static void processAlphaPoint(GaussianShell &shell);
+  static void processBetaPoint(GaussianShell &shell);
   static void processDensity(GaussianShell &shell);
+  static void processSpinDensity(GaussianShell &shell);
   static double pointS(GaussianSet *set, unsigned int moIndex,
-                       double dr2, unsigned int indexMO);
+                       double dr2, unsigned int indexMO, orbType type);
   static double pointP(GaussianSet *set, unsigned int moIndex,
                        const Eigen::Vector3d &delta,
-                       double dr2, unsigned int indexMO);
+                       double dr2, unsigned int indexMO, orbType type);
   static double pointD(GaussianSet *set, unsigned int moIndex,
                        const Eigen::Vector3d &delta,
-                       double dr2, unsigned int indexMO);
+                       double dr2, unsigned int indexMO, orbType type);
   static double pointD5(GaussianSet *set, unsigned int moIndex,
                         const Eigen::Vector3d &delta,
-                        double dr2, unsigned int indexMO);
+                        double dr2, unsigned int indexMO, orbType type);
   /// Calculate the basis for the density
   static void pointS(GaussianSet *set, double dr2, int basis,
                      Eigen::MatrixXd &out);
@@ -248,6 +267,7 @@ private:
   static void pointD5(GaussianSet *set, const Eigen::Vector3d &delta,
                       double dr2, int basis, Eigen::MatrixXd &out);
   bool generateDensity();
+  bool generateSpinDensity();
 };
 
 } // End namespace

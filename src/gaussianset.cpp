@@ -218,6 +218,76 @@ bool GaussianSet::calculateCubeMO(Cube *cube, unsigned int state)
   return true;
 }
 
+bool GaussianSet::calculateCubeAlphaMO(Cube *cube, unsigned int state)
+{
+  // Set up the calculation and ideally use the new QtConcurrent code to
+  // multithread the calculation...
+  if (state < 1 || state > static_cast<unsigned int>(m_alphaMoMatrix.rows()))
+    return false;
+
+  outputAlphaAll();
+  // Must be called before calculations begin
+  initCalculation();
+
+  // Set up the points we want to calculate the density at
+  m_gaussianShells = new QVector<GaussianShell>(cube->data()->size());
+
+  for (int i = 0; i < m_gaussianShells->size(); ++i) {
+    (*m_gaussianShells)[i].set = this;
+    (*m_gaussianShells)[i].tCube = cube;
+    (*m_gaussianShells)[i].pos = i;
+    (*m_gaussianShells)[i].state = state;
+  }
+
+  // Lock the cube until we are done.
+  cube->lock()->lockForWrite();
+
+  // Watch for the future
+  connect(&m_watcher, SIGNAL(finished()), this, SLOT(calculationComplete()));
+
+  // The main part of the mapped reduced function...
+  m_future = QtConcurrent::map(*m_gaussianShells, GaussianSet::processAlphaPoint);
+  // Connect our watcher to our future
+  m_watcher.setFuture(m_future);
+
+  return true;
+}
+
+bool GaussianSet::calculateCubeBetaMO(Cube *cube, unsigned int state)
+{
+  // Set up the calculation and ideally use the new QtConcurrent code to
+  // multithread the calculation...
+  if (state < 1 || state > static_cast<unsigned int>(m_betaMoMatrix.rows()))
+    return false;
+
+  outputBetaAll();
+  // Must be called before calculations begin
+  initCalculation();
+
+  // Set up the points we want to calculate the density at
+  m_gaussianShells = new QVector<GaussianShell>(cube->data()->size());
+
+  for (int i = 0; i < m_gaussianShells->size(); ++i) {
+    (*m_gaussianShells)[i].set = this;
+    (*m_gaussianShells)[i].tCube = cube;
+    (*m_gaussianShells)[i].pos = i;
+    (*m_gaussianShells)[i].state = state;
+  }
+
+  // Lock the cube until we are done.
+  cube->lock()->lockForWrite();
+
+  // Watch for the future
+  connect(&m_watcher, SIGNAL(finished()), this, SLOT(calculationComplete()));
+
+  // The main part of the mapped reduced function...
+  m_future = QtConcurrent::map(*m_gaussianShells, GaussianSet::processBetaPoint);
+  // Connect our watcher to our future
+  m_watcher.setFuture(m_future);
+
+  return true;
+}
+
 bool GaussianSet::calculateCubeDensity(Cube *cube)
 {
   if (m_density.size() == 0) {
@@ -250,6 +320,43 @@ bool GaussianSet::calculateCubeDensity(Cube *cube)
 
   // The main part of the mapped reduced function...
   m_future = QtConcurrent::map(*m_gaussianShells, GaussianSet::processDensity);
+  // Connect our watcher to our future
+  m_watcher.setFuture(m_future);
+
+  return true;
+}
+bool GaussianSet::calculateCubeSpinDensity(Cube *cube)
+{
+  if (m_density.size() == 0) {
+    bool dens=generateSpinDensity();
+    if(!dens) {
+      qDebug() << "Cannot calculate spin density -- spin density matrix not set.";
+      return false;
+    }
+  }
+
+  // FIXME Still not working, committed so others could see current state.
+
+  // Must be called before calculations begin
+  initCalculation();
+
+  // Set up the points we want to calculate the density at
+  m_gaussianShells = new QVector<GaussianShell>(cube->data()->size());
+
+  for (int i = 0; i < m_gaussianShells->size(); ++i) {
+    (*m_gaussianShells)[i].set = this;
+    (*m_gaussianShells)[i].tCube = cube;
+    (*m_gaussianShells)[i].pos = i;
+  }
+
+  // Lock the cube until we are done.
+  cube->lock()->lockForWrite();
+
+  // Watch for the future
+  connect(&m_watcher, SIGNAL(finished()), this, SLOT(calculationComplete()));
+
+  // The main part of the mapped reduced function...
+  m_future = QtConcurrent::map(*m_gaussianShells, GaussianSet::processSpinDensity);
   // Connect our watcher to our future
   m_watcher.setFuture(m_future);
 
@@ -429,23 +536,130 @@ void GaussianSet::processPoint(GaussianShell &shell)
 
   // Now calculate the value at this point in space
   double tmp = 0.0;
+  orbType type = Doubly;
   for (unsigned int i = 0; i < basisSize; ++i) {
     switch(basis[i]) {
     case S:
       tmp += pointS(shell.set, i,
-                    dr2[set->m_atomIndices[i]], indexMO);
+                    dr2[set->m_atomIndices[i]], indexMO, type);
       break;
     case P:
       tmp += pointP(shell.set, i, deltas[set->m_atomIndices[i]],
-                    dr2[set->m_atomIndices[i]], indexMO);
+                    dr2[set->m_atomIndices[i]], indexMO, type);
       break;
     case D:
       tmp += pointD(shell.set, i, deltas[set->m_atomIndices[i]],
-                    dr2[set->m_atomIndices[i]], indexMO);
+                    dr2[set->m_atomIndices[i]], indexMO , type);
       break;
     case D5:
       tmp += pointD5(shell.set, i, deltas[set->m_atomIndices[i]],
-                     dr2[set->m_atomIndices[i]], indexMO);
+                     dr2[set->m_atomIndices[i]], indexMO, type);
+      break;
+    default:
+      // Not handled - return a zero contribution
+      ;
+    }
+  }
+  // Set the value
+  shell.tCube->setValue(shell.pos, tmp);
+}
+
+void GaussianSet::processAlphaPoint(GaussianShell &shell)
+{
+  GaussianSet *set = shell.set;
+  unsigned int atomsSize = set->m_numAtoms;
+  unsigned int basisSize = set->m_symmetry.size();
+  std::vector<int> &basis = set->m_symmetry;
+  vector<Vector3d> deltas;
+  vector<double> dr2;
+  deltas.reserve(atomsSize);
+  dr2.reserve(atomsSize);
+
+  unsigned int indexMO = shell.state-1;
+
+  // Calculate our position
+  Vector3d pos = shell.tCube->position(shell.pos) * ANGSTROM_TO_BOHR;
+  //qDebug() << pos.x() << " " << pos.y() << " " << pos.y();
+
+  // Calculate the deltas for the position
+  for (unsigned int i = 0; i < atomsSize; ++i) {
+    deltas.push_back(pos - set->m_molecule.atomPos(i));
+    dr2.push_back(deltas[i].squaredNorm());
+  }
+
+  // Now calculate the value at this point in space
+  double tmp = 0.0;
+  orbType type = Alpha;
+  for (unsigned int i = 0; i < basisSize; ++i) {
+    switch(basis[i]) {
+    case S:
+      tmp += pointS(shell.set, i,
+                    dr2[set->m_atomIndices[i]], indexMO, type);
+      break;
+    case P:
+      tmp += pointP(shell.set, i, deltas[set->m_atomIndices[i]],
+                    dr2[set->m_atomIndices[i]], indexMO, type);
+      break;
+    case D:
+      tmp += pointD(shell.set, i, deltas[set->m_atomIndices[i]],
+                    dr2[set->m_atomIndices[i]], indexMO , type);
+      break;
+    case D5:
+      tmp += pointD5(shell.set, i, deltas[set->m_atomIndices[i]],
+                     dr2[set->m_atomIndices[i]], indexMO, type);
+      break;
+    default:
+      // Not handled - return a zero contribution
+      ;
+    }
+  }
+  // Set the value
+  shell.tCube->setValue(shell.pos, tmp);
+}
+
+void GaussianSet::processBetaPoint(GaussianShell &shell)
+{
+  GaussianSet *set = shell.set;
+  unsigned int atomsSize = set->m_numAtoms;
+  unsigned int basisSize = set->m_symmetry.size();
+  std::vector<int> &basis = set->m_symmetry;
+  vector<Vector3d> deltas;
+  vector<double> dr2;
+  deltas.reserve(atomsSize);
+  dr2.reserve(atomsSize);
+
+  unsigned int indexMO = shell.state-1;
+
+  // Calculate our position
+  Vector3d pos = shell.tCube->position(shell.pos) * ANGSTROM_TO_BOHR;
+  //qDebug() << pos.x() << " " << pos.y() << " " << pos.y();
+
+  // Calculate the deltas for the position
+  for (unsigned int i = 0; i < atomsSize; ++i) {
+    deltas.push_back(pos - set->m_molecule.atomPos(i));
+    dr2.push_back(deltas[i].squaredNorm());
+  }
+
+  // Now calculate the value at this point in space
+  double tmp = 0.0;
+  orbType type = Beta;
+  for (unsigned int i = 0; i < basisSize; ++i) {
+    switch(basis[i]) {
+    case S:
+      tmp += pointS(shell.set, i,
+                    dr2[set->m_atomIndices[i]], indexMO, type);
+      break;
+    case P:
+      tmp += pointP(shell.set, i, deltas[set->m_atomIndices[i]],
+                    dr2[set->m_atomIndices[i]], indexMO, type);
+      break;
+    case D:
+      tmp += pointD(shell.set, i, deltas[set->m_atomIndices[i]],
+                    dr2[set->m_atomIndices[i]], indexMO , type);
+      break;
+    case D5:
+      tmp += pointD5(shell.set, i, deltas[set->m_atomIndices[i]],
+                     dr2[set->m_atomIndices[i]], indexMO, type);
       break;
     default:
       // Not handled - return a zero contribution
@@ -516,11 +730,86 @@ void GaussianSet::processDensity(GaussianShell &shell)
   shell.tCube->setValue(shell.pos, rho);
 }
 
-inline double GaussianSet::pointS(GaussianSet *set, unsigned int moIndex,
-                                  double dr2, unsigned int indexMO)
+void GaussianSet::processSpinDensity(GaussianShell &shell)
 {
+  GaussianSet *set = shell.set;
+  unsigned int atomsSize = set->m_numAtoms;
+  unsigned int basisSize = set->m_symmetry.size();
+  unsigned int matrixSize = set->m_spinDensity.rows();
+  std::vector<int> &basis = set->m_symmetry;
+  vector<Vector3d> deltas;
+  vector<double> dr2;
+  deltas.reserve(atomsSize);
+  dr2.reserve(atomsSize);
+
+  // Calculate our position
+  Vector3d pos = shell.tCube->position(shell.pos) * ANGSTROM_TO_BOHR;
+  // Calculate the deltas for the position
+  for (unsigned int i = 0; i < atomsSize; ++i) {
+    deltas.push_back(pos - set->m_molecule.atomPos(i));
+    dr2.push_back(deltas[i].squaredNorm());
+  }
+
+  // Calculate the basis set values at this point
+  MatrixXd values(matrixSize, 1);
+  for (unsigned int i = 0; i < basisSize; ++i) {
+    unsigned int cAtom = set->m_atomIndices[i];
+    switch(basis[i]) {
+    case S:
+      pointS(shell.set, dr2[cAtom], i, values);
+      break;
+    case P:
+      pointP(shell.set, deltas[cAtom], dr2[cAtom], i, values);
+      break;
+    case D:
+      pointD(shell.set, deltas[cAtom], dr2[cAtom], i, values);
+      break;
+    case D5:
+      pointD5(shell.set, deltas[cAtom], dr2[cAtom], i, values);
+      break;
+    default:
+      // Not handled - return a zero contribution
+      ;
+    }
+  }
+
+  // Now calculate the value of the density at this point in space
+  double rho = 0.0;
+  for (unsigned int i = 0; i < matrixSize; ++i) {
+    // Calculate the off-diagonal parts of the matrix
+    for (unsigned int j = 0; j < i; ++j) {
+      rho += 2.0 * set->m_spinDensity.coeffRef(i, j)
+          * (values.coeffRef(i, 0) * values.coeffRef(j, 0));
+    }
+    // Now calculate the matrix diagonal
+    rho += set->m_spinDensity.coeffRef(i, i)
+        * (values.coeffRef(i, 0) * values.coeffRef(i, 0));
+  }
+
+  // Set the value
+  shell.tCube->setValue(shell.pos, rho);
+}
+
+inline double GaussianSet::pointS(GaussianSet *set, unsigned int moIndex,
+                                  double dr2, unsigned int indexMO,orbType type)
+{
+  //determine the orbital we want
+  double coeff;
+  switch(type)
+  {
+    case Doubly:
+      coeff = set->m_moMatrix.coeffRef(set->m_moIndices[moIndex], indexMO);
+      break;
+    case Alpha:
+      coeff = set->m_alphaMoMatrix.coeffRef(set->m_moIndices[moIndex], indexMO);
+      break;
+    case Beta:
+      coeff = set->m_betaMoMatrix.coeffRef(set->m_moIndices[moIndex], indexMO);
+      break;
+  }
   // If the MO coefficient is very small skip it
-  if (isSmall(set->m_moMatrix.coeffRef(set->m_moIndices[moIndex], indexMO))) {
+  //if (isSmall(set->m_moMatrix.coeffRef(set->m_moIndices[moIndex], indexMO))) {
+  if(isSmall(coeff)) {
     return 0.0;
   }
 
@@ -532,17 +821,19 @@ inline double GaussianSet::pointS(GaussianSet *set, unsigned int moIndex,
     tmp += set->m_gtoCN[cIndex++] * exp(-set->m_gtoA[i] * dr2);
   }
   // There is one MO coefficient per S shell basis
-  return tmp * set->m_moMatrix.coeffRef(set->m_moIndices[moIndex], indexMO);
+  //return tmp * set->m_moMatrix.coeffRef(set->m_moIndices[moIndex], indexMO);
+  return tmp * coeff;
 }
 
 inline double GaussianSet::pointP(GaussianSet *set, unsigned int moIndex,
                                   const Vector3d &delta,
-                                  double dr2, unsigned int indexMO)
+                                  double dr2, unsigned int indexMO, orbType type)
 {
   // P type orbitals have three components and each component has a different
   // independent MO weighting. Many things can be cached to save time though
   unsigned int baseIndex = set->m_moIndices[moIndex];
   double x = 0.0, y = 0.0, z = 0.0;
+
 
   // Now iterate through the P type GTOs and sum their contributions
   unsigned int cIndex = set->m_cIndices[moIndex];
@@ -554,17 +845,37 @@ inline double GaussianSet::pointP(GaussianSet *set, unsigned int moIndex,
     z += set->m_gtoCN[cIndex++] * delta.z() * tmpGTO;
   }
 
-  // Calculate the prefactors for Px, Py and Pz
+  /* Calculate the prefactors for Px, Py and Pz
   double Px = set->m_moMatrix.coeffRef(baseIndex  , indexMO);
   double Py = set->m_moMatrix.coeffRef(baseIndex+1, indexMO);
   double Pz = set->m_moMatrix.coeffRef(baseIndex+2, indexMO);
+  */
+  double Px,Py,Pz;
+  switch(type)
+  {
+    case Doubly:
+      Px = set->m_moMatrix.coeffRef(baseIndex  , indexMO);
+      Py = set->m_moMatrix.coeffRef(baseIndex+1, indexMO);
+      Pz = set->m_moMatrix.coeffRef(baseIndex+2, indexMO);
+      break;
+    case Alpha:
+      Px = set->m_alphaMoMatrix.coeffRef(baseIndex  , indexMO);
+      Py = set->m_alphaMoMatrix.coeffRef(baseIndex+1, indexMO);
+      Pz = set->m_alphaMoMatrix.coeffRef(baseIndex+2, indexMO);
+      break;
+    case Beta:
+      Px = set->m_betaMoMatrix.coeffRef(baseIndex  , indexMO);
+      Py = set->m_betaMoMatrix.coeffRef(baseIndex+1, indexMO);
+      Pz = set->m_betaMoMatrix.coeffRef(baseIndex+2, indexMO);
+      break;
+  }
 
   return Px*x + Py*y + Pz*z;
 }
 
 inline double GaussianSet::pointD(GaussianSet *set, unsigned int moIndex,
                                   const Vector3d &delta,
-                                  double dr2, unsigned int indexMO)
+                                  double dr2, unsigned int indexMO,orbType type)
 {
   // D type orbitals have six components and each component has a different
   // independent MO weighting. Many things can be cached to save time though
@@ -585,25 +896,53 @@ inline double GaussianSet::pointD(GaussianSet *set, unsigned int moIndex,
     yz += set->m_gtoCN[cIndex++] * tmpGTO; // Dyz
   }
 
+  double Cxx,Cyy,Czz,Cxy,Cxz,Cyz;
+  switch(type)
+  {
+    case Doubly:
+      Cxx = set->m_moMatrix.coeffRef(baseIndex  , indexMO);
+      Cyy = set->m_moMatrix.coeffRef(baseIndex+1, indexMO);
+      Czz = set->m_moMatrix.coeffRef(baseIndex+2, indexMO);
+      Cxy = set->m_moMatrix.coeffRef(baseIndex+3, indexMO);
+      Cxz = set->m_moMatrix.coeffRef(baseIndex+4, indexMO);
+      Cyz = set->m_moMatrix.coeffRef(baseIndex+5, indexMO);
+      break;
+    case Alpha:
+      Cxx = set->m_alphaMoMatrix.coeffRef(baseIndex  , indexMO);
+      Cyy = set->m_alphaMoMatrix.coeffRef(baseIndex+1, indexMO);
+      Czz = set->m_alphaMoMatrix.coeffRef(baseIndex+2, indexMO);
+      Cxy = set->m_alphaMoMatrix.coeffRef(baseIndex+3, indexMO);
+      Cxz = set->m_alphaMoMatrix.coeffRef(baseIndex+4, indexMO);
+      Cyz = set->m_alphaMoMatrix.coeffRef(baseIndex+5, indexMO);
+      break;
+    case Beta:
+      Cxx = set->m_betaMoMatrix.coeffRef(baseIndex  , indexMO);
+      Cyy = set->m_betaMoMatrix.coeffRef(baseIndex+1, indexMO);
+      Czz = set->m_betaMoMatrix.coeffRef(baseIndex+2, indexMO);
+      Cxy = set->m_betaMoMatrix.coeffRef(baseIndex+3, indexMO);
+      Cxz = set->m_betaMoMatrix.coeffRef(baseIndex+4, indexMO);
+      Cyz = set->m_betaMoMatrix.coeffRef(baseIndex+5, indexMO);
+      break;
+  }
   // Calculate the prefactors
-  double Dxx = set->m_moMatrix.coeffRef(baseIndex  , indexMO) * delta.x()
+  double Dxx = Cxx * delta.x()
       * delta.x();
-  double Dyy = set->m_moMatrix.coeffRef(baseIndex+1, indexMO) * delta.y()
+  double Dyy = Cyy * delta.y()
       * delta.y();
-  double Dzz = set->m_moMatrix.coeffRef(baseIndex+2, indexMO) * delta.z()
+  double Dzz = Czz * delta.z()
       * delta.z();
-  double Dxy = set->m_moMatrix.coeffRef(baseIndex+3, indexMO) * delta.x()
+  double Dxy = Cxy * delta.x()
       * delta.y();
-  double Dxz = set->m_moMatrix.coeffRef(baseIndex+4, indexMO) * delta.x()
+  double Dxz = Cxz * delta.x()
       * delta.z();
-  double Dyz = set->m_moMatrix.coeffRef(baseIndex+5, indexMO) * delta.y()
+  double Dyz = Cyz * delta.y()
       * delta.z();
   return Dxx*xx + Dyy*yy + Dzz*zz + Dxy*xy + Dxz*xz + Dyz*yz;
 }
 
 inline double GaussianSet::pointD5(GaussianSet *set, unsigned int moIndex,
                                    const Vector3d &delta,
-                                   double dr2, unsigned int indexMO)
+                                   double dr2, unsigned int indexMO,orbType type)
 {
   // D type orbitals have five components and each component has a different
   // MO weighting. Many things can be cached to save time
@@ -631,11 +970,37 @@ inline double GaussianSet::pointD5(GaussianSet *set, unsigned int moIndex,
   double xz = delta.x() * delta.z();
   double yz = delta.y() * delta.z();
 
-  double D0  = set->m_moMatrix.coeffRef(baseIndex  , indexMO) * (zz - dr2);
-  double D1p = set->m_moMatrix.coeffRef(baseIndex+1, indexMO) * xz;
-  double D1n = set->m_moMatrix.coeffRef(baseIndex+2, indexMO) * yz;
-  double D2p = set->m_moMatrix.coeffRef(baseIndex+3, indexMO) * (xx - yy);
-  double D2n = set->m_moMatrix.coeffRef(baseIndex+4, indexMO) * xy;
+  double C0,C1p,C1n,C2p,C2n;
+  switch(type)
+  {
+    case Doubly:
+      C0  = set->m_moMatrix.coeffRef(baseIndex  , indexMO);
+      C1p = set->m_moMatrix.coeffRef(baseIndex+1, indexMO);
+      C1n = set->m_moMatrix.coeffRef(baseIndex+2, indexMO);
+      C2p = set->m_moMatrix.coeffRef(baseIndex+3, indexMO);
+      C2n = set->m_moMatrix.coeffRef(baseIndex+4, indexMO);
+      break;
+    case Alpha:
+      C0  = set->m_alphaMoMatrix.coeffRef(baseIndex  , indexMO);
+      C1p = set->m_alphaMoMatrix.coeffRef(baseIndex+1, indexMO);
+      C1n = set->m_alphaMoMatrix.coeffRef(baseIndex+2, indexMO);
+      C2p = set->m_alphaMoMatrix.coeffRef(baseIndex+3, indexMO);
+      C2n = set->m_alphaMoMatrix.coeffRef(baseIndex+4, indexMO);
+      break;
+    case Beta:
+      C0  = set->m_betaMoMatrix.coeffRef(baseIndex  , indexMO);
+      C1p = set->m_betaMoMatrix.coeffRef(baseIndex+1, indexMO);
+      C1n = set->m_betaMoMatrix.coeffRef(baseIndex+2, indexMO);
+      C2p = set->m_betaMoMatrix.coeffRef(baseIndex+3, indexMO);
+      C2n = set->m_betaMoMatrix.coeffRef(baseIndex+4, indexMO);
+      break;
+  }
+
+  double D0  = C0  * (zz - dr2);
+  double D1p = C1p * xz;
+  double D1n = C1n * yz;
+  double D2p = C2p * (xx - yy);
+  double D2n = C2n * xy;
 
   return D0*d0 + D1p*d1p + D1n*d1n + D2p*d2p + D2n*d2n;
 }
@@ -784,7 +1149,7 @@ bool GaussianSet::generateDensity()
             m_density(jBasis,iBasis) += 2.0*icoeff*jcoeff;
             m_density(iBasis,jBasis) = m_density(jBasis,iBasis);
           }
-          //qDebug() << iBasis << ", " << jBasis << ": " << m_density(iBasis,jBasis);
+          qDebug() << iBasis << ", " << jBasis << ": " << m_density(iBasis,jBasis);
           break;
         case uhf:
           for (unsigned int iaMO=0;iaMO < m_electronsA; iaMO++)
@@ -801,8 +1166,40 @@ bool GaussianSet::generateDensity()
             m_density(jBasis,iBasis) += icoeff*jcoeff;
             m_density(iBasis,jBasis) = m_density(jBasis,iBasis);
           }
+          qDebug() << iBasis << ", " << jBasis << ": " << m_density(iBasis,jBasis);
           break;
       }
+    }
+  }
+  return true;
+}
+bool GaussianSet::generateSpinDensity()
+{
+
+  if(m_scfType != uhf)
+    return false;
+
+  m_spinDensity.resize(m_numMOs, m_numMOs);
+  m_spinDensity=Eigen::MatrixXd::Zero(m_numMOs,m_numMOs);
+  for (unsigned int iBasis=0; iBasis < m_numMOs; iBasis++)
+  {
+    for (unsigned int jBasis=0;jBasis<=iBasis; jBasis++)
+    {
+      for (unsigned int iaMO=0;iaMO < m_electronsA; iaMO++)
+      {
+        double icoeff = m_alphaMoMatrix(iBasis,iaMO);
+        double jcoeff = m_alphaMoMatrix(jBasis,iaMO);
+        m_spinDensity(jBasis,iBasis) += icoeff*jcoeff;
+        m_spinDensity(iBasis,jBasis) = m_spinDensity(jBasis,iBasis);
+      }
+      for (unsigned int ibMO=0;ibMO < m_electronsB; ibMO++)
+      {
+        double icoeff = m_betaMoMatrix(iBasis,ibMO);
+        double jcoeff = m_betaMoMatrix(jBasis,ibMO);
+        m_spinDensity(jBasis,iBasis) -= icoeff*jcoeff;
+        m_spinDensity(iBasis,jBasis) = m_spinDensity(jBasis,iBasis);
+      }
+      qDebug() << iBasis << ", " << jBasis << ": " << m_spinDensity(iBasis,jBasis);
     }
   }
   return true;
@@ -888,6 +1285,206 @@ void GaussianSet::outputAll()
       std::cout << "Shell " << i << "\tF7\n  MO 1";
       for (short j = 0; j < 7; ++j)
         std::cout << "\t" << m_moMatrix(0, m_moIndices[i] + j);
+      std::cout << std::endl;
+      break;
+    default:
+      qDebug() << "Error: unhandled type...";
+    }
+    unsigned int cIndex = m_gtoIndices[i];
+    for (uint j = m_gtoIndices[i]; j < m_gtoIndices[i+1]; ++j) {
+      if (j >= m_gtoA.size()) {
+        qDebug() << "Error, j is too large!" << j << m_gtoA.size();
+        continue;
+      }
+      qDebug() << cIndex
+               << "\tc:" << m_gtoC[cIndex]
+               << "\ta:" << m_gtoA[cIndex];
+      ++cIndex;
+    }
+  }
+  qDebug() << "\nEnd of orbital data...\n";
+}
+
+void GaussianSet::outputAlphaAll()
+{
+  // Can be called to print out a summary of the basis set as read in
+  m_numAtoms = m_molecule.numAtoms();
+  qDebug() << "\nGaussian Basis Set\nNumber of atoms:" << m_numAtoms;
+  switch(m_scfType)
+  {
+    case rhf:
+      qDebug() << "RHF orbitals";
+      break;
+    case uhf:
+      qDebug() << "UHF orbitals";
+      break;
+    case rohf:
+      qDebug() << "ROHF orbitals";
+      break;
+    default:
+      qDebug() << "Uknown orbitals";
+      break;
+  }
+
+
+  initCalculation();
+
+  if (!isValid()) {
+    qDebug() << "Basis set is marked as invalid.";
+    return;
+  }
+
+  for (uint i = 0; i < m_symmetry.size(); ++i) {
+    qDebug() << i
+             << "\tAtom Index:" << m_atomIndices[i]
+             << "\tSymmetry:" << m_symmetry[i]
+             << "\tMO Index:" << m_moIndices[i]
+             << "\tGTO Index:" << m_gtoIndices[i];
+  }
+  qDebug() << "Symmetry:" << m_symmetry.size()
+           << "\tgtoIndices:" << m_gtoIndices.size()
+           << "\tLast gtoIndex:" << m_gtoIndices[m_symmetry.size()]
+           << "\ngto size:" << m_gtoA.size() << m_gtoC.size() << m_gtoCN.size();
+  for (uint i = 0; i < m_symmetry.size(); ++i) {
+    switch(m_symmetry[i]) {
+    case S:
+      qDebug() << "Shell" << i << "\tS\n  MO 1\t"
+               << m_alphaMoMatrix(0, m_moIndices[i])
+               << m_alphaMoMatrix(m_moIndices[i], 0);
+      break;
+    case P:
+      qDebug() << "Shell" << i << "\tP\n  MO 1\t"
+               << m_alphaMoMatrix(0, m_moIndices[i])
+               << "\t" << m_alphaMoMatrix(0, m_moIndices[i] + 1)
+               << "\t" << m_alphaMoMatrix(0, m_moIndices[i] + 2);
+      break;
+    case D:
+      qDebug() << "Shell" << i << "\tD\n  MO 1\t"
+               << m_alphaMoMatrix(0, m_moIndices[i])
+               << "\t" << m_alphaMoMatrix(0, m_moIndices[i] + 1)
+               << "\t" << m_alphaMoMatrix(0, m_moIndices[i] + 2)
+               << "\t" << m_alphaMoMatrix(0, m_moIndices[i] + 3)
+               << "\t" << m_alphaMoMatrix(0, m_moIndices[i] + 4)
+               << "\t" << m_alphaMoMatrix(0, m_moIndices[i] + 5);
+      break;
+    case D5:
+      qDebug() << "Shell" << i << "\tD5\n  MO 1\t"
+               << m_alphaMoMatrix(0, m_moIndices[i])
+               << "\t" << m_alphaMoMatrix(0, m_moIndices[i] + 1)
+               << "\t" << m_alphaMoMatrix(0, m_moIndices[i] + 2)
+               << "\t" << m_alphaMoMatrix(0, m_moIndices[i] + 3)
+               << "\t" << m_alphaMoMatrix(0, m_moIndices[i] + 4);
+      break;
+    case F:
+      std::cout << "Shell " << i << "\tF\n  MO 1";
+      for (short j = 0; j < 10; ++j)
+        std::cout << "\t" << m_alphaMoMatrix(0, m_moIndices[i] + j);
+      std::cout << std::endl;
+      break;
+    case F7:
+      std::cout << "Shell " << i << "\tF7\n  MO 1";
+      for (short j = 0; j < 7; ++j)
+        std::cout << "\t" << m_alphaMoMatrix(0, m_moIndices[i] + j);
+      std::cout << std::endl;
+      break;
+    default:
+      qDebug() << "Error: unhandled type...";
+    }
+    unsigned int cIndex = m_gtoIndices[i];
+    for (uint j = m_gtoIndices[i]; j < m_gtoIndices[i+1]; ++j) {
+      if (j >= m_gtoA.size()) {
+        qDebug() << "Error, j is too large!" << j << m_gtoA.size();
+        continue;
+      }
+      qDebug() << cIndex
+               << "\tc:" << m_gtoC[cIndex]
+               << "\ta:" << m_gtoA[cIndex];
+      ++cIndex;
+    }
+  }
+  qDebug() << "\nEnd of orbital data...\n";
+}
+
+void GaussianSet::outputBetaAll()
+{
+  // Can be called to print out a summary of the basis set as read in
+  m_numAtoms = m_molecule.numAtoms();
+  qDebug() << "\nGaussian Basis Set\nNumber of atoms:" << m_numAtoms;
+  switch(m_scfType)
+  {
+    case rhf:
+      qDebug() << "RHF orbitals";
+      break;
+    case uhf:
+      qDebug() << "UHF orbitals";
+      break;
+    case rohf:
+      qDebug() << "ROHF orbitals";
+      break;
+    default:
+      qDebug() << "Uknown orbitals";
+      break;
+  }
+
+
+  initCalculation();
+
+  if (!isValid()) {
+    qDebug() << "Basis set is marked as invalid.";
+    return;
+  }
+
+  for (uint i = 0; i < m_symmetry.size(); ++i) {
+    qDebug() << i
+             << "\tAtom Index:" << m_atomIndices[i]
+             << "\tSymmetry:" << m_symmetry[i]
+             << "\tMO Index:" << m_moIndices[i]
+             << "\tGTO Index:" << m_gtoIndices[i];
+  }
+  qDebug() << "Symmetry:" << m_symmetry.size()
+           << "\tgtoIndices:" << m_gtoIndices.size()
+           << "\tLast gtoIndex:" << m_gtoIndices[m_symmetry.size()]
+           << "\ngto size:" << m_gtoA.size() << m_gtoC.size() << m_gtoCN.size();
+  for (uint i = 0; i < m_symmetry.size(); ++i) {
+    switch(m_symmetry[i]) {
+    case S:
+      qDebug() << "Shell" << i << "\tS\n  MO 1\t"
+               << m_betaMoMatrix(0, m_moIndices[i])
+               << m_betaMoMatrix(m_moIndices[i], 0);
+      break;
+    case P:
+      qDebug() << "Shell" << i << "\tP\n  MO 1\t"
+               << m_betaMoMatrix(0, m_moIndices[i])
+               << "\t" << m_betaMoMatrix(0, m_moIndices[i] + 1)
+               << "\t" << m_betaMoMatrix(0, m_moIndices[i] + 2);
+      break;
+    case D:
+      qDebug() << "Shell" << i << "\tD\n  MO 1\t"
+               << m_betaMoMatrix(0, m_moIndices[i])
+               << "\t" << m_betaMoMatrix(0, m_moIndices[i] + 1)
+               << "\t" << m_betaMoMatrix(0, m_moIndices[i] + 2)
+               << "\t" << m_betaMoMatrix(0, m_moIndices[i] + 3)
+               << "\t" << m_betaMoMatrix(0, m_moIndices[i] + 4)
+               << "\t" << m_betaMoMatrix(0, m_moIndices[i] + 5);
+      break;
+    case D5:
+      qDebug() << "Shell" << i << "\tD5\n  MO 1\t"
+               << m_betaMoMatrix(0, m_moIndices[i])
+               << "\t" << m_betaMoMatrix(0, m_moIndices[i] + 1)
+               << "\t" << m_betaMoMatrix(0, m_moIndices[i] + 2)
+               << "\t" << m_betaMoMatrix(0, m_moIndices[i] + 3)
+               << "\t" << m_betaMoMatrix(0, m_moIndices[i] + 4);
+      break;
+    case F:
+      std::cout << "Shell " << i << "\tF\n  MO 1";
+      for (short j = 0; j < 10; ++j)
+        std::cout << "\t" << m_betaMoMatrix(0, m_moIndices[i] + j);
+      std::cout << std::endl;
+      break;
+    case F7:
+      std::cout << "Shell " << i << "\tF7\n  MO 1";
+      for (short j = 0; j < 7; ++j)
+        std::cout << "\t" << m_betaMoMatrix(0, m_moIndices[i] + j);
       std::cout << std::endl;
       break;
     default:

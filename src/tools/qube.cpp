@@ -67,6 +67,26 @@ int main(int argc, char *argv[])
     calcType = 2;
     orbID = atoi(argv[3]);
   }
+  else if (argv[2] == std::string("alphaorbital"))
+  {
+    if(argc < 4)
+    {
+      cerr << "Please specify the orbital number" << endl;
+      return 1;
+    }
+    calcType = 3;
+    orbID = atoi(argv[3]);
+  }
+  else if (argv[2] == std::string("betaorbital"))
+  {
+    if(argc < 4)
+    {
+      cerr << "Please specify the orbital number" << endl;
+      return 1;
+    }
+    calcType = 4;
+    orbID = atoi(argv[3]);
+  }
   else
   {
     cerr << argv[2] << " is an unkown cube content" << endl;
@@ -95,10 +115,16 @@ int main(int argc, char *argv[])
       m_basis->blockingCalculateCubeDensity(m_qube);
       break;
     case 1:
-      //m_basis->blockingCalculateCubeSpingDensity(m_qube);
+      m_basis->blockingCalculateCubeSpinDensity(m_qube);
       break;
     case 2:
       m_basis->blockingCalculateCubeMO(m_qube,orbID);
+      break;
+    case 3:
+      m_basis->blockingCalculateCubeAlphaMO(m_qube,orbID);
+      break;
+    case 4:
+      m_basis->blockingCalculateCubeBetaMO(m_qube,orbID);
       break;
     default:
       cerr << "calcType set to " << calcType << ".  Why?" << endl;

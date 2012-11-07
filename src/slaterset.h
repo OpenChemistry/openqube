@@ -125,8 +125,11 @@ public:
   void outputAll();
 
   bool calculateCubeMO(Cube *cube, unsigned int state = 1);
+  bool calculateCubeAlphaMO(Cube *cube, unsigned int state = 1);
+  bool calculateCubeBetaMO(Cube *cube, unsigned int state = 1);
 
   bool calculateCubeDensity(Cube *cube);
+  bool calculateCubeSpinDensity(Cube *cube);
 
   QFutureWatcher<void> & watcher() { return m_watcher; }
 

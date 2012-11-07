@@ -31,9 +31,33 @@ bool BasisSet::blockingCalculateCubeMO(Cube *cube, unsigned int mo)
   return true;
 }
 
+bool BasisSet::blockingCalculateCubeAlphaMO(Cube *cube, unsigned int mo)
+{
+  if (!this->calculateCubeAlphaMO(cube, mo))
+    return false;
+  this->watcher().waitForFinished();
+  return true;
+}
+
+bool BasisSet::blockingCalculateCubeBetaMO(Cube *cube, unsigned int mo)
+{
+  if (!this->calculateCubeBetaMO(cube, mo))
+    return false;
+  this->watcher().waitForFinished();
+  return true;
+}
+
 bool BasisSet::blockingCalculateCubeDensity(Cube *cube)
 {
   if (!this->calculateCubeDensity(cube))
+    return false;
+  this->watcher().waitForFinished();
+  return true;
+}
+
+bool BasisSet::blockingCalculateCubeSpinDensity(Cube *cube)
+{
+  if (!this->calculateCubeSpinDensity(cube))
     return false;
   this->watcher().waitForFinished();
   return true;

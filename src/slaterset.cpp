@@ -141,6 +141,16 @@ void SlaterSet::outputAll()
 
 }
 
+bool SlaterSet::calculateCubeAlphaMO(Cube *cube, unsigned int state)
+{
+  return false;
+}
+
+bool SlaterSet::calculateCubeBetaMO(Cube *cube, unsigned int state)
+{
+  return false;
+}
+
 bool SlaterSet::calculateCubeMO(Cube *cube, unsigned int state)
 {
   // Set up the calculation and ideally use the new QtConcurrent code to
@@ -212,6 +222,11 @@ bool SlaterSet::calculateCubeDensity(Cube *cube)
   m_watcher.setFuture(m_future);
 
   return true;
+}
+
+bool SlaterSet::calculateCubeSpinDensity(Cube *cube)
+{
+  return false;
 }
 
 BasisSet * SlaterSet::clone()
