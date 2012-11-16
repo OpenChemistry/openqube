@@ -182,6 +182,12 @@ bool GaussianSet::setDensityMatrix(const Eigen::MatrixXd &m)
   m_density = m;
   return true;
 }
+bool GaussianSet::setSpinDensityMatrix(const Eigen::MatrixXd &m)
+{
+  m_spinDensity.resize(m.rows(), m.cols());
+  m_spinDensity = m;
+  return true;
+}
 
 bool GaussianSet::calculateCubeMO(Cube *cube, unsigned int state)
 {
@@ -327,7 +333,7 @@ bool GaussianSet::calculateCubeDensity(Cube *cube)
 }
 bool GaussianSet::calculateCubeSpinDensity(Cube *cube)
 {
-  if (m_density.size() == 0) {
+  if (m_spinDensity.size() == 0) {
     bool dens=generateSpinDensity();
     if(!dens) {
       qDebug() << "Cannot calculate spin density -- spin density matrix not set.";

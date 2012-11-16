@@ -44,6 +44,8 @@ GaussianFchk::GaussianFchk(const QString &filename, GaussianSet* basis)
   // Now it should all be loaded load it into the basis set
   load(basis);
 
+  outputAll();
+
   delete file;
 }
 
@@ -65,11 +67,19 @@ void GaussianFchk::processLine()
   QStringList list = tmp.split(' ', QString::SkipEmptyParts);
 
   // Big switch statement checking for various things we are interested in
-  if (key == "Number of atoms")
+  if (key.contains("RHF")) {
+        m_scftype=rhf;
+  } else if (key.contains("UHF")) {
+        m_scftype=uhf;
+  } else if (key == "Number of atoms") {
     qDebug() << "Number of atoms =" << list.at(1).toInt();
-  else if (key == "Number of electrons")
+  } else if (key == "Number of electrons") {
     m_electrons = list.at(1).toInt();
-  else if (key == "Number of basis functions") {
+  } else if (key == "Number of alpha electrons") {
+    m_electronsA = list.at(1).toInt();
+  } else if (key == "Number of beta electrons") {
+    m_electronsB = list.at(1).toInt();
+  } else if (key == "Number of basis functions") {
     m_numBasisFunctions = list.at(1).toInt();
     qDebug() << "Number of basis functions =" << m_numBasisFunctions;
   }
@@ -98,15 +108,32 @@ void GaussianFchk::processLine()
   else if (key == "P(S=P) Contraction coefficients")
     m_csp = readArrayD(list.at(2).toInt(), 16);
   else if (key == "Alpha Orbital Energies") {
-    m_orbitalEnergy = readArrayD(list.at(2).toInt(), 16);
-    qDebug() << "MO energies, n =" << m_orbitalEnergy.size();
+    if(m_scftype == rhf) {
+      m_orbitalEnergy = readArrayD(list.at(2).toInt(), 16);
+      qDebug() << "MO energies, n =" << m_orbitalEnergy.size();
+    } else if (m_scftype == uhf) {
+      m_alphaOrbitalEnergy = readArrayD(list.at(2).toInt(), 16);
+      qDebug() << "Alpha MO energies, n =" << m_alphaOrbitalEnergy.size();
+    } else if (key == "Beta Orbital Energies") {
+      m_betaOrbitalEnergy = readArrayD(list.at(2).toInt(), 16);
+      qDebug() << "Beta MO energies, n =" << m_betaOrbitalEnergy.size();
+    }
   }
   else if (key == "Alpha MO coefficients") {
-    m_MOcoeffs = readArrayD(list.at(2).toInt(), 16);
-    if (static_cast<int>(m_MOcoeffs.size()) == list.at(2).toInt())
-      qDebug() << "MO coefficients, n =" << m_MOcoeffs.size();
-    else
+    if(m_scftype == rhf) {
+      m_MOcoeffs = readArrayD(list.at(2).toInt(), 16);
+      if (static_cast<int>(m_MOcoeffs.size()) == list.at(2).toInt())
+        qDebug() << "MO coefficients, n =" << m_MOcoeffs.size();
+    } else if (m_scftype == uhf) {
+      m_alphaMOcoeffs = readArrayD(list.at(2).toInt(), 16);
+      if (static_cast<int>(m_alphaMOcoeffs.size()) == list.at(2).toInt())
+        qDebug() << "Alpha MO coefficients, n =" << m_alphaMOcoeffs.size();
+    } else
       qDebug() << "Error, MO coefficients, n =" << m_MOcoeffs.size();
+  } else if (key == "Beta MO coefficients") {
+      m_betaMOcoeffs = readArrayD(list.at(2).toInt(), 16);
+      if (static_cast<int>(m_betaMOcoeffs.size()) == list.at(2).toInt())
+        qDebug() << "Beta MO coefficients, n =" << m_betaMOcoeffs.size();
   }
   else if (key == "Total SCF Density") {
     if (readDensityMatrix(list.at(2).toInt(), 16))
@@ -114,12 +141,20 @@ void GaussianFchk::processLine()
     else
       qDebug() << "Error reading in the SCF density matrix.";
   }
+  else if (key == "Spin SCF Density") {
+    if (readSpinDensityMatrix(list.at(2).toInt(), 16))
+      qDebug() << "SCF spin density matrix read in" << m_spinDensity.rows();
+    else
+      qDebug() << "Error reading in the SCF spin density matrix.";
+  }
 }
 
 void GaussianFchk::load(GaussianSet* basis)
 {
   // Now load up our basis set
   basis->setNumElectrons(m_electrons);
+  basis->setNumAlphaElectrons(m_electronsA);
+  basis->setNumBetaElectrons(m_electronsB);
   int nAtom = 0;
   for (unsigned int i = 0; i < m_aPos.size(); i += 3)
     basis->addAtom(Vector3d(m_aPos.at(i), m_aPos.at(i+1), m_aPos.at(i+2)),
@@ -203,10 +238,16 @@ void GaussianFchk::load(GaussianSet* basis)
   if (basis->isValid()) {
     if (m_MOcoeffs.size())
       basis->addMOs(m_MOcoeffs);
+    if (m_alphaMOcoeffs.size())
+      basis->addAlphaMOs(m_alphaMOcoeffs);
+    if (m_betaMOcoeffs.size())
+      basis->addBetaMOs(m_betaMOcoeffs);
     else
       qDebug() << "Error - no MO coefficients read in.";
     if (m_density.rows())
       basis->setDensityMatrix(m_density);
+    if (m_spinDensity.rows())
+      basis->setSpinDensityMatrix(m_spinDensity);
   }
 }
 
@@ -374,17 +415,113 @@ bool GaussianFchk::readDensityMatrix(unsigned int n, int width)
   }
   return true;
 }
+bool GaussianFchk::readSpinDensityMatrix(unsigned int n, int width)
+{
+  // This function reads in the lower triangular density matrix
+  m_spinDensity.resize(m_numBasisFunctions, m_numBasisFunctions);
+  unsigned int cnt = 0;
+  unsigned int i = 0, j = 0;
+  unsigned int f = 1;
+  bool ok = false;
+  while (cnt < n) {
+    if (m_in->atEnd()) {
+      qDebug() << "GaussianFchk::readSpinDensityMatrix could not read all elements"
+               << n << "expected" << cnt << "parsed.";
+      return false;
+    }
+    QString line = m_in->readLine();
+    if (line.isEmpty())
+      return false;
+
+    if (width == 0) { // we can split by spaces
+      QStringList list = line.split(' ', QString::SkipEmptyParts);
+      for (int k = 0; k < list.size(); ++k) {
+        if (cnt >= n) {
+          qDebug() << "Too many variables read in. File may be inconsistent."
+                   << cnt << "of" << n;
+          return false;
+        }
+        // Read in lower half matrix
+        m_spinDensity(i, j) = list.at(k).toDouble(&ok);
+        if (ok) { // Valid double converted, carry on
+          ++j; ++cnt;
+          if (j == f) {
+            // We need to move down to the next row and increment f - lower tri
+            j = 0;
+            ++f;
+            ++i;
+          }
+        }
+        else { // Invalid conversion of a string to double
+          qDebug() << "Warning: problem converting string to double:"
+                   << list.at(k) << "\nIn GaussianFchk::readDensityMatrix.";
+          return false;
+        }
+      }
+    }
+    else { // Q-Chem files use 16-character fields
+      int maxColumns = 80 / width;
+      for (int c = 0; c < maxColumns; ++c) {
+        QString substring = line.mid(c * width, width);
+        if (substring.length() != width)
+          break;
+        else if (cnt >= n) {
+          qDebug() << "Too many variables read in. File may be inconsistent."
+                   << cnt << "of" << n;
+          return false;
+        }
+        // Read in lower half matrix
+        m_spinDensity(i, j) = substring.toDouble(&ok);
+        if (ok) { // Valid double converted, carry on
+          ++j; ++cnt;
+          if (j == f) {
+            // We need to move down to the next row and increment f - lower tri
+            j = 0;
+            ++f;
+            ++i;
+          }
+        }
+        else { // Invalid conversion of a string to double
+          qDebug() << "Warning: problem converting string to double:"
+                   << substring << "\nIn GaussianFchk::readSpinDensityMatrix.";
+          return false;
+        }
+      }
+    }
+  }
+  return true;
+}
 
 void GaussianFchk::outputAll()
 {
+  switch(m_scftype)
+  {
+    case rhf:
+      qDebug() << "SCF type = RHF";
+      break;
+    case uhf:
+      qDebug() << "SCF type = UHF";
+      break;
+    case rohf:
+      qDebug() << "SCF type = ROHF";
+      break;
+    default:
+      qDebug() << "SCF type = Unknown";
+  }
   qDebug() << "Shell mappings.";
   for (unsigned int i = 0; i < m_shellTypes.size(); ++i)
     qDebug() << i << ": type =" << m_shellTypes.at(i)
              << ", number =" << m_shellNums.at(i)
              << ", atom =" << m_shelltoAtom.at(i);
-  qDebug() << "MO coefficients.";
+  if(m_MOcoeffs.size()) qDebug() << "MO coefficients.";
   for (unsigned int i = 0; i < m_MOcoeffs.size(); ++i)
     qDebug() << m_MOcoeffs.at(i);
+  if(m_alphaMOcoeffs.size()) qDebug() << "Alpha MO coefficients.";
+  for (unsigned int i = 0; i < m_alphaMOcoeffs.size(); ++i)
+    qDebug() << m_alphaMOcoeffs.at(i);
+  if(m_betaMOcoeffs.size()) qDebug() << "Beta MO coefficients.";
+  for (unsigned int i = 0; i < m_betaMOcoeffs.size(); ++i)
+    qDebug() << m_betaMOcoeffs.at(i);
 }
 
 }

@@ -118,6 +118,11 @@ public:
    */
   bool setDensityMatrix(const Eigen::MatrixXd &m);
 
+  /**
+   * Set the spin density matrix for the GaussianSet.
+   */
+  bool setSpinDensityMatrix(const Eigen::MatrixXd &m);
+
   //this one builds the density matrix, provided certain information is known
   bool setDensityMatrix();
 

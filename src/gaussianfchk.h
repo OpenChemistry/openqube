@@ -29,6 +29,8 @@ class GaussianSet;
 
 class GaussianFchk
 {
+  enum scf  { rhf, uhf, rohf, Unknown };
+
 public:
   GaussianFchk(const QString &filename, GaussianSet *basis);
   ~GaussianFchk();
@@ -40,8 +42,11 @@ private:
   std::vector<int> readArrayI(unsigned int n);
   std::vector<double> readArrayD(unsigned int n, int width = 0);
   bool readDensityMatrix(unsigned int n, int width = 0);
+  bool readSpinDensityMatrix(unsigned int n, int width = 0);
 
   int m_electrons;
+  int m_electronsA;
+  int m_electronsB;
   unsigned int m_numBasisFunctions;
   std::vector<int> m_aNums;
   std::vector<double> m_aPos;
@@ -52,8 +57,14 @@ private:
   std::vector<double> m_c;
   std::vector<double> m_csp;
   std::vector<double> m_orbitalEnergy;
+  std::vector<double> m_alphaOrbitalEnergy;
+  std::vector<double> m_betaOrbitalEnergy;
   std::vector<double> m_MOcoeffs;
+  std::vector<double> m_alphaMOcoeffs;
+  std::vector<double> m_betaMOcoeffs;
   Eigen::MatrixXd m_density;     /// Total density matrix
+  Eigen::MatrixXd m_spinDensity; /// Spin density matrix
+  scf m_scftype;
 };
 
 } // End namespace openqube

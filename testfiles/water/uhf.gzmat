@@ -1,0 +1,10 @@
+%chk=uhf.chk
+# uhf/sto-3g gfinput IOP(6/7=1)
+
+water
+
+1 2
+O
+H 1 0.9572
+H 1 0.9572 2 104.5
+
