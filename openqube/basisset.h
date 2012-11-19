@@ -18,7 +18,7 @@
 #ifndef BASISSET_H
 #define BASISSET_H
 
-#include "openqubeabi.h"
+#include "openqubeexport.h"
 
 #include "molecule.h"
 

@@ -17,7 +17,7 @@
 #ifndef OQ_CUBE_H
 #define OQ_CUBE_H
 
-#include "openqubeabi.h"
+#include "openqubeexport.h"
 
 #include <vector>
 #include <Eigen/Core>

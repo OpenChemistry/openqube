@@ -2,6 +2,8 @@ find_package(Qt4 4.6 REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(AvogadroLibs REQUIRED)
 
+include(GenerateExportHeader)
+
 include_directories(SYSTEM ${QT_INCLUDE_DIR} ${EIGEN3_INCLUDE_DIR}
   ${AvogadroLibs_INCLUDE_DIRS})
 
@@ -15,7 +17,6 @@ set(openqube_HDRS
   gamessus.h
   gaussianset.h
   molecule.h
-  openqubeabi.h
   slaterset.h
 )
 
@@ -44,6 +45,10 @@ set_target_properties(OpenQube PROPERTIES
   LINK_INTERFACE_LIBRARIES ""
   SOVERSION 0
   LABELS openqube)
+
+generate_export_header(OpenQube EXPORT_FILE_NAME openqubeexport.h)
+list(APPEND openqube_HDRS ${CMAKE_CURRENT_BINARY_DIR}/openqubeexport.h)
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 target_link_libraries(OpenQube ${QT_QTCORE_LIBRARY} AvogadroCore)
 

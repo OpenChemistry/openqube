@@ -17,7 +17,7 @@
 #ifndef OQ_MOLECULE_H
 #define OQ_MOLECULE_H
 
-#include "openqubeabi.h"
+#include "openqubeexport.h"
 
 #include <avogadro/core/molecule.h>
 #include "atom.h"

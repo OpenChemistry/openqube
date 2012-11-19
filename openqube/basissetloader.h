@@ -17,7 +17,7 @@
 #ifndef OQ_BASISSETLOADER_H
 #define OQ_BASISSETLOADER_H
 
-#include "openqubeabi.h"
+#include "openqubeexport.h"
 
 // Forward declarations
 class QString;
