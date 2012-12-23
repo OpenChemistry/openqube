@@ -48,7 +48,8 @@ public:
   /**
    * Constructor.
    */
-  BasisSet() : m_electrons(0),m_electronsA(0),m_electronsB(0),m_valid(true) {}
+  BasisSet()
+    : m_electrons(0), m_electronsAlpha(0), m_electronsBeta(0), m_valid(true) {}
 
   /**
    * Destructor.
@@ -64,12 +65,12 @@ public:
    * Set the number of electrons in the BasisSet.
    * @param n The number of electrons in the BasisSet.
    */
-  void setNumAlphaElectrons(unsigned int n) { m_electronsA = n; }
+  void setNumAlphaElectrons(unsigned int n) { m_electronsAlpha = n; }
   /**
    * Set the number of electrons in the BasisSet.
    * @param n The number of electrons in the BasisSet.
    */
-  void setNumBetaElectrons(unsigned int n) { m_electronsB = n; }
+  void setNumBetaElectrons(unsigned int n) { m_electronsBeta = n; }
 
   /**
    * @return The number of electrons in the molecule.
@@ -78,11 +79,11 @@ public:
   /**
    * @return The number of electrons in the molecule.
    */
-  unsigned int numAlphaElectrons() { return m_electronsA; }
+  unsigned int numAlphaElectrons() { return m_electronsAlpha; }
   /**
    * @return The number of electrons in the molecule.
    */
-  unsigned int numBetaElectrons() { return m_electronsB; }
+  unsigned int numBetaElectrons() { return m_electronsBeta; }
 
   /**
    * Set the molecule for the basis set.
@@ -217,8 +218,8 @@ public:
 protected:
   /// Total number of electrons
   unsigned int m_electrons;
-  unsigned int m_electronsA;
-  unsigned int m_electronsB;
+  unsigned int m_electronsAlpha;
+  unsigned int m_electronsBeta;
 
   /** Is the loaded basis set valid? Allows us to mark a basis set invalid if we
    * were not able to interpret part of it.

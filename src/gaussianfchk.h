@@ -29,7 +29,7 @@ class GaussianSet;
 
 class GaussianFchk
 {
-  enum scf  { rhf, uhf, rohf, Unknown };
+  enum scf { rhf, uhf, rohf, Unknown };
 
 public:
   GaussianFchk(const QString &filename, GaussianSet *basis);
@@ -44,9 +44,13 @@ private:
   bool readDensityMatrix(unsigned int n, int width = 0);
   bool readSpinDensityMatrix(unsigned int n, int width = 0);
 
+  /**
+   * Use either m_electrons, or m_electronsAlpha and m_electronsBeta.
+   * This then carries through to the energy, coefficients etc.
+   */
   int m_electrons;
-  int m_electronsA;
-  int m_electronsB;
+  int m_electronsAlpha;
+  int m_electronsBeta;
   unsigned int m_numBasisFunctions;
   std::vector<int> m_aNums;
   std::vector<double> m_aPos;

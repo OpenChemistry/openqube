@@ -232,14 +232,9 @@ private:
   unsigned int m_numAtoms;       //! Total number of atoms in the basis set
   bool m_init;                   //! Has the calculation been initialised?
 
-  unsigned int m_numElectrons;
-  unsigned int m_numAlphaElectrons;
-  unsigned int m_numBetaElectrons;
-
   QFuture<void> m_future;
   QFutureWatcher<void> m_watcher;
-  Cube *m_cube;                  //! Cube to put the results into
-  //this is really the grid?
+  Cube *m_cube;                  //! Cube to put the results into (3D grid).
   QVector<GaussianShell> *m_gaussianShells;
 
   static bool isSmall(double val);

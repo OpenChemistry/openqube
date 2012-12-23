@@ -44,8 +44,6 @@ GaussianFchk::GaussianFchk(const QString &filename, GaussianSet* basis)
   // Now it should all be loaded load it into the basis set
   load(basis);
 
-  outputAll();
-
   delete file;
 }
 
@@ -76,9 +74,9 @@ void GaussianFchk::processLine()
   } else if (key == "Number of electrons") {
     m_electrons = list.at(1).toInt();
   } else if (key == "Number of alpha electrons") {
-    m_electronsA = list.at(1).toInt();
+    m_electronsAlpha = list.at(1).toInt();
   } else if (key == "Number of beta electrons") {
-    m_electronsB = list.at(1).toInt();
+    m_electronsBeta = list.at(1).toInt();
   } else if (key == "Number of basis functions") {
     m_numBasisFunctions = list.at(1).toInt();
     qDebug() << "Number of basis functions =" << m_numBasisFunctions;
@@ -108,7 +106,7 @@ void GaussianFchk::processLine()
   else if (key == "P(S=P) Contraction coefficients")
     m_csp = readArrayD(list.at(2).toInt(), 16);
   else if (key == "Alpha Orbital Energies") {
-    if(m_scftype == rhf) {
+    if (m_scftype == rhf) {
       m_orbitalEnergy = readArrayD(list.at(2).toInt(), 16);
       qDebug() << "MO energies, n =" << m_orbitalEnergy.size();
     } else if (m_scftype == uhf) {
@@ -120,7 +118,7 @@ void GaussianFchk::processLine()
     }
   }
   else if (key == "Alpha MO coefficients") {
-    if(m_scftype == rhf) {
+    if (m_scftype == rhf) {
       m_MOcoeffs = readArrayD(list.at(2).toInt(), 16);
       if (static_cast<int>(m_MOcoeffs.size()) == list.at(2).toInt())
         qDebug() << "MO coefficients, n =" << m_MOcoeffs.size();
@@ -153,8 +151,8 @@ void GaussianFchk::load(GaussianSet* basis)
 {
   // Now load up our basis set
   basis->setNumElectrons(m_electrons);
-  basis->setNumAlphaElectrons(m_electronsA);
-  basis->setNumBetaElectrons(m_electronsB);
+  basis->setNumAlphaElectrons(m_electronsAlpha);
+  basis->setNumBetaElectrons(m_electronsBeta);
   int nAtom = 0;
   for (unsigned int i = 0; i < m_aPos.size(); i += 3)
     basis->addAtom(Vector3d(m_aPos.at(i), m_aPos.at(i+1), m_aPos.at(i+2)),
@@ -494,8 +492,7 @@ bool GaussianFchk::readSpinDensityMatrix(unsigned int n, int width)
 
 void GaussianFchk::outputAll()
 {
-  switch(m_scftype)
-  {
+  switch (m_scftype) {
     case rhf:
       qDebug() << "SCF type = RHF";
       break;
@@ -513,13 +510,16 @@ void GaussianFchk::outputAll()
     qDebug() << i << ": type =" << m_shellTypes.at(i)
              << ", number =" << m_shellNums.at(i)
              << ", atom =" << m_shelltoAtom.at(i);
-  if(m_MOcoeffs.size()) qDebug() << "MO coefficients.";
+  if (m_MOcoeffs.size())
+    qDebug() << "MO coefficients.";
   for (unsigned int i = 0; i < m_MOcoeffs.size(); ++i)
     qDebug() << m_MOcoeffs.at(i);
-  if(m_alphaMOcoeffs.size()) qDebug() << "Alpha MO coefficients.";
+  if (m_alphaMOcoeffs.size())
+    qDebug() << "Alpha MO coefficients.";
   for (unsigned int i = 0; i < m_alphaMOcoeffs.size(); ++i)
     qDebug() << m_alphaMOcoeffs.at(i);
-  if(m_betaMOcoeffs.size()) qDebug() << "Beta MO coefficients.";
+  if (m_betaMOcoeffs.size())
+    qDebug() << "Beta MO coefficients.";
   for (unsigned int i = 0; i < m_betaMOcoeffs.size(); ++i)
     qDebug() << m_betaMOcoeffs.at(i);
 }

@@ -30,8 +30,9 @@ using std::vector;
 namespace OpenQube
 {
 
-GAMESSUSOutput::GAMESSUSOutput(const QString &filename, GaussianSet* basis):
-  m_coordFactor(1.0), m_currentMode(NotParsing), m_currentAtom(1), m_currentScfMode(doubly)
+GAMESSUSOutput::GAMESSUSOutput(const QString &filename, GaussianSet* basis) :
+  m_coordFactor(1.0), m_currentMode(NotParsing), m_currentAtom(1),
+  m_currentScfMode(doubly)
 {
   // Open the file for reading and process it
   QFile* file = new QFile(filename);
@@ -41,9 +42,8 @@ GAMESSUSOutput::GAMESSUSOutput(const QString &filename, GaussianSet* basis):
   qDebug() << "File" << filename << "opened.";
 
   // Process the formatted checkpoint and extract all the information we need
-  while (!m_in->atEnd()) {
+  while (!m_in->atEnd())
     processLine(basis);
-  }
 
   // Now it should all be loaded load it into the basis set
   load(basis);
@@ -59,9 +59,8 @@ void GAMESSUSOutput::processLine(GaussianSet *basis)
 {
   // First truncate the line, remove trailing white space and check for blank lines
   QString key = m_in->readLine().trimmed();
-  while(key.isEmpty() && !m_in->atEnd()) {
+  while (key.isEmpty() && !m_in->atEnd())
     key = m_in->readLine().trimmed();
-  }
 
   if (m_in->atEnd())
     return;
@@ -80,15 +79,15 @@ void GAMESSUSOutput::processLine(GaussianSet *basis)
     m_coordFactor = 1.0; // coordinates are supposed to be in bohr?!
     m_currentMode = Atoms;
     key = m_in->readLine().trimmed(); // skip the column titles
-  }
-  else if (key.contains("COORDINATES OF ALL ATOMS ARE (ANGS)", Qt::CaseInsensitive)) {
+  } else if (key.contains("COORDINATES OF ALL ATOMS ARE (ANGS)",
+                          Qt::CaseInsensitive)) {
     basis->moleculeRef().clearAtoms();
 
     m_coordFactor = 1.0/BOHR_TO_ANGSTROM; // in Angstroms now
     m_currentMode = Atoms;
     key = m_in->readLine(); // skip column titles
     key = m_in->readLine(); // and ----- line
-  } else if (key.contains("INTERNUCLEAR DISTANCES",Qt::CaseInsensitive)) {
+  } else if (key.contains("INTERNUCLEAR DISTANCES", Qt::CaseInsensitive)) {
     //this silly parser is far too greedy
     m_currentMode = NotParsing;
   } else if (key.contains("ATOMIC BASIS SET")) {
@@ -138,14 +137,12 @@ void GAMESSUSOutput::processLine(GaussianSet *basis)
     key = m_in->readLine(); // EIGENVECTORS
     key = m_in->readLine(); // ------------
     key = m_in->readLine(); // blank line
-
-  } else if (key.contains("EIGENVECTORS") && m_currentScfMode==beta) { 
+  } else if (key.contains("EIGENVECTORS") && m_currentScfMode==beta) {
     //beta is set at the conclustion of alpha reads
     m_currentMode = MO;
     key = m_in->readLine(); // ------------
     key = m_in->readLine(); // blank line
-
-  } else if (key.contains("EIGENVECTORS") && m_scftype==rhf) { 
+  } else if (key.contains("EIGENVECTORS") && m_scftype==rhf) {
     //|| key.contains("MOLECULAR ORBITALS")) {
     m_currentMode = MO;
     m_currentScfMode = doubly;
@@ -214,21 +211,20 @@ void GAMESSUSOutput::processLine(GaussianSet *basis)
       break;
 
     case MO:
-      switch(m_currentScfMode)
-      {
-        case alpha:
-          m_alphaMOcoeffs.clear();
-          break;
-        case beta:
-          m_betaMOcoeffs.clear();
-          break;
-        case doubly:
-          m_MOcoeffs.clear(); // if the orbitals were punched multiple times
-          break;
-        default:
-          ;
+      switch (m_currentScfMode) {
+      case alpha:
+        m_alphaMOcoeffs.clear();
+        break;
+      case beta:
+        m_betaMOcoeffs.clear();
+        break;
+      case doubly:
+        m_MOcoeffs.clear(); // if the orbitals were punched multiple times
+        break;
+      default:
+        ;
       }
-      while(!key.contains("END OF") && !key.contains("-----")) {
+      while (!key.contains("END OF") && !key.contains("-----")) {
         // currently reading the MO number
         key = m_in->readLine(); // energies
         key = m_in->readLine(); // symmetries
@@ -237,13 +233,14 @@ void GAMESSUSOutput::processLine(GaussianSet *basis)
         while (list.size() > 5) {
           numColumns = list.size() - 4;
           columns.resize(numColumns);
-          for (unsigned int i = 0; i < numColumns; ++i) {
+          for (unsigned int i = 0; i < numColumns; ++i)
             columns[i].push_back(list[i + 4].toDouble());
-          }
 
           key = m_in->readLine();
-          if (key.contains(QLatin1String("END OF RHF")) || key.contains(QLatin1String("END OF UHF"))) 
+          if (key.contains(QLatin1String("END OF RHF")) ||
+              key.contains(QLatin1String("END OF UHF"))) {
             break;
+          }
           list = key.split(' ', QString::SkipEmptyParts);
         } // ok, we've finished one batch of MO coeffs
 
@@ -252,19 +249,18 @@ void GAMESSUSOutput::processLine(GaussianSet *basis)
           numRows = columns[i].size();
           for (unsigned int j = 0; j < numRows; ++j) {
             //qDebug() << "push back" << columns[i][j];
-            switch(m_currentScfMode)
-            {
-              case alpha:
-                m_alphaMOcoeffs.push_back(columns[i][j]);
-                break;
-              case beta:
-                m_betaMOcoeffs.push_back(columns[i][j]);
-                break;
-              case doubly:
-                m_MOcoeffs.push_back(columns[i][j]);
-                break;
-              default:
-                ;
+            switch (m_currentScfMode) {
+            case alpha:
+              m_alphaMOcoeffs.push_back(columns[i][j]);
+              break;
+            case beta:
+              m_betaMOcoeffs.push_back(columns[i][j]);
+              break;
+            case doubly:
+              m_MOcoeffs.push_back(columns[i][j]);
+              break;
+            default:
+              ;
             }
           }
         }
@@ -274,7 +270,7 @@ void GAMESSUSOutput::processLine(GaussianSet *basis)
           key = m_in->readLine(); // skip the blank line after the MOs
       } // finished parsing MOs
       m_currentMode = NotParsing;
-      if(m_currentScfMode == alpha)
+      if (m_currentScfMode == alpha)
         m_currentScfMode = beta;
       break;
 
@@ -286,7 +282,6 @@ void GAMESSUSOutput::processLine(GaussianSet *basis)
 
 void GAMESSUSOutput::load(GaussianSet* basis)
 {
-
   outputAll();
 
   // Now load up our basis set
@@ -338,83 +333,78 @@ void GAMESSUSOutput::load(GaussianSet* basis)
   //if (m_density.rows())
     //basis->setDensityMatrix(m_density);
 
-  switch(m_scftype)
-  {
-    case rhf:
-      basis->m_scfType = (OpenQube::scfType)0;
-      break;
-    case uhf:
-      basis->m_scfType = (OpenQube::scfType)1;
-      break;
-    case rohf:
-      basis->m_scfType = (OpenQube::scfType)2;
-      break;
-    case Unknown:
-      basis->m_scfType = (OpenQube::scfType)3;
-      break;
-    default:
-      basis->m_scfType = (OpenQube::scfType)3;
-      break;
+  switch (m_scftype) {
+  case rhf:
+    basis->m_scfType = (OpenQube::scfType)0;
+    break;
+  case uhf:
+    basis->m_scfType = (OpenQube::scfType)1;
+    break;
+  case rohf:
+    basis->m_scfType = (OpenQube::scfType)2;
+    break;
+  case Unknown:
+    basis->m_scfType = (OpenQube::scfType)3;
+    break;
+  default:
+    basis->m_scfType = (OpenQube::scfType)3;
+    break;
   }
   qDebug() << " done loadBasis ";
 }
 
 void GAMESSUSOutput::outputAll()
 {
-  switch(m_scftype)
-  {
-    case rhf:
-      qDebug() << "SCF type = RHF";
-      break;
-    case uhf:
-      qDebug() << "SCF type = UHF";
-      break;
-    case rohf:
-      qDebug() << "SCF type = ROHF";
-      break;
-    default:
-      qDebug() << "SCF typ = Unknown";
+  switch (m_scftype) {
+  case rhf:
+    qDebug() << "SCF type = RHF";
+    break;
+  case uhf:
+    qDebug() << "SCF type = UHF";
+    break;
+  case rohf:
+    qDebug() << "SCF type = ROHF";
+    break;
+  default:
+    qDebug() << "SCF typ = Unknown";
   }
   qDebug() << "Shell mappings.";
-  for (unsigned int i = 0; i < m_shellTypes.size(); ++i)
+  for (unsigned int i = 0; i < m_shellTypes.size(); ++i) {
     qDebug() << i << ": type =" << m_shellTypes.at(i)
              << ", number =" << m_shellNums.at(i)
              << ", atom =" << m_shelltoAtom.at(i);
-  if(m_MOcoeffs.size()) qDebug() << "MO coefficients.";
+  }
+  if (m_MOcoeffs.size())
+    qDebug() << "MO coefficients.";
   for (unsigned int i = 0; i < m_MOcoeffs.size(); ++i)
     qDebug() << m_MOcoeffs.at(i);
-  if(m_alphaMOcoeffs.size()) qDebug() << "Alpha MO coefficients.";
+  if (m_alphaMOcoeffs.size())
+    qDebug() << "Alpha MO coefficients.";
   for (unsigned int i = 0; i < m_alphaMOcoeffs.size(); ++i)
     qDebug() << m_alphaMOcoeffs.at(i);
-  if(m_betaMOcoeffs.size()) qDebug() << "Beta MO coefficients.";
+  if (m_betaMOcoeffs.size())
+    qDebug() << "Beta MO coefficients.";
   for (unsigned int i = 0; i < m_betaMOcoeffs.size(); ++i)
     qDebug() << m_betaMOcoeffs.at(i);
-
 }
 
 void GAMESSUSOutput::generateDensity()
 {
-
   m_numBasisFunctions=sqrt(m_MOcoeffs.size());
   m_density.resize(m_numBasisFunctions, m_numBasisFunctions);
   m_density=Eigen::MatrixXd::Zero(m_numBasisFunctions,m_numBasisFunctions);
-  for (unsigned int iBasis=0; iBasis < m_numBasisFunctions; iBasis++)
-  {
-    for (unsigned int jBasis=0;jBasis<=iBasis; jBasis++)
-    {
-      for (unsigned int iMO=0;iMO < m_electrons/2; iMO++)
-      {
-        double icoeff = m_MOcoeffs.at(iMO*m_numBasisFunctions+iBasis);
-        double jcoeff = m_MOcoeffs.at(iMO*m_numBasisFunctions+jBasis);
-        m_density(jBasis,iBasis) += 2.0*icoeff*jcoeff;
-        m_density(iBasis,jBasis) = m_density(jBasis,iBasis);
+  for (unsigned int iBasis = 0; iBasis < m_numBasisFunctions; ++iBasis) {
+    for (unsigned int jBasis = 0;jBasis <= iBasis; ++jBasis) {
+      for (unsigned int iMO = 0;iMO < m_electrons / 2; ++iMO) {
+        double icoeff = m_MOcoeffs.at(iMO * m_numBasisFunctions + iBasis);
+        double jcoeff = m_MOcoeffs.at(iMO * m_numBasisFunctions + jBasis);
+        m_density(jBasis, iBasis) += 2.0 * icoeff * jcoeff;
+        m_density(iBasis, jBasis) = m_density(jBasis, iBasis);
 
       }
-      qDebug() << iBasis << ", " << jBasis << ": " << m_density(iBasis,jBasis);
+      qDebug() << iBasis << ", " << jBasis << ": " << m_density(iBasis, jBasis);
     }
   }
 }
-
-
 
 }
